@@ -45,7 +45,7 @@ export function SettingsScreen() {
         <Subtitle>{therapist?.email}</Subtitle>
 
         <Card>
-          <Text style={{ fontWeight: "700", color: colors.text, marginBottom: 8 }}>
+          <Text style={{ fontWeight: "700", color: colors.label, marginBottom: 8 }}>
             {t("settings.profile")}
           </Text>
           <Field label={t("settings.name")} value={name} onChangeText={setName} />
@@ -58,10 +58,10 @@ export function SettingsScreen() {
         </Card>
 
         <Card>
-          <Text style={{ fontWeight: "700", color: colors.text, marginBottom: 8 }}>
+          <Text style={{ fontWeight: "700", color: colors.label, marginBottom: 8 }}>
             {t("settings.notifications")}
           </Text>
-          <Text style={{ color: colors.textSecondary, marginBottom: 8 }}>
+          <Text style={{ color: colors.secondaryLabel, marginBottom: 8 }}>
             {t("settings.defaultReminder")}
           </Text>
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
@@ -77,7 +77,7 @@ export function SettingsScreen() {
         </Card>
 
         <Card>
-          <Text style={{ fontWeight: "700", color: colors.text, marginBottom: 8 }}>
+          <Text style={{ fontWeight: "700", color: colors.label, marginBottom: 8 }}>
             {t("settings.language")}
           </Text>
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
@@ -99,10 +99,10 @@ export function SettingsScreen() {
         </Card>
 
         <Card>
-          <Text style={{ fontWeight: "700", color: colors.text, marginBottom: 8 }}>
+          <Text style={{ fontWeight: "700", color: colors.label, marginBottom: 8 }}>
             {t("settings.sync")}
           </Text>
-          <Text style={{ color: colors.textSecondary }}>
+          <Text style={{ color: colors.secondaryLabel }}>
             {isSupabaseConfigured
               ? t("settings.syncOn")
               : t("settings.syncOff")}

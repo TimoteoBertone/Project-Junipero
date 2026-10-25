@@ -1,19 +1,16 @@
 import React, { useMemo } from "react";
 import { FlatList, Pressable, Text } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Button, Card, Empty, Screen, Subtitle, Title } from "../../components/ui";
 import { useAppStore } from "../../store/AppStore";
 import { formatArt, formatClientLocal, displayArtDate } from "../../lib/time";
 import { recurrenceLabel } from "../../lib/recurrence";
 import { colors } from "../../theme/colors";
-import { AppointmentsStackParamList } from "../../navigation/types";
 
 export function AppointmentsScreen() {
   const { t } = useTranslation();
-  const navigation =
-    useNavigation<NativeStackNavigationProp<AppointmentsStackParamList>>();
+  const router = useRouter();
   const { appointments, clients } = useAppStore();
 
   const sorted = useMemo(
@@ -31,7 +28,7 @@ export function AppointmentsScreen() {
 
       <Button
         label={t("appointments.add")}
-        onPress={() => navigation.navigate("AppointmentForm", {})}
+        onPress={() => router.push("/(app)/appointments/form")}
       />
 
       <FlatList
@@ -47,22 +44,23 @@ export function AppointmentsScreen() {
           return (
             <Pressable
               onPress={() =>
-                navigation.navigate("AppointmentForm", {
-                  appointmentId: item.id,
+                router.push({
+                  pathname: "/(app)/appointments/form",
+                  params: { appointmentId: item.id },
                 })
               }
             >
               <Card>
                 <Text
-                  style={{ fontWeight: "700", fontSize: 16, color: colors.text }}
+                  style={{ fontWeight: "700", fontSize: 16, color: colors.label }}
                 >
                   {name}
                 </Text>
-                <Text style={{ color: colors.textSecondary, marginTop: 4 }}>
+                <Text style={{ color: colors.secondaryLabel, marginTop: 4 }}>
                   {displayArtDate(item.startsAtUtc)} · ART {formatArt(item.startsAtUtc)} ·
                   origin {formatClientLocal(item.startsAtUtc, item.clientIanaTz)}
                 </Text>
-                <Text style={{ color: colors.primary, marginTop: 6 }}>
+                <Text style={{ color: colors.tint, marginTop: 6 }}>
                   {t(`status.${item.status}`)} ·{" "}
                   {t(`recurrence.${item.recurrenceMode}`, {
                     defaultValue: recurrenceLabel(

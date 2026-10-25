@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   Button,
@@ -15,12 +14,10 @@ import {
 } from "../../components/ui";
 import { useAppStore } from "../../store/AppStore";
 import { colors } from "../../theme/colors";
-import { ClientsStackParamList } from "../../navigation/types";
 
 export function ClientsScreen() {
   const { t } = useTranslation();
-  const navigation =
-    useNavigation<NativeStackNavigationProp<ClientsStackParamList>>();
+  const router = useRouter();
   const { clients, geoStats } = useAppStore();
   const [query, setQuery] = useState("");
   const [country, setCountry] = useState<string | null>(null);
@@ -71,7 +68,7 @@ export function ClientsScreen() {
 
       <Button
         label={t("clients.add")}
-        onPress={() => navigation.navigate("ClientForm", {})}
+        onPress={() => router.push("/(app)/clients/form")}
       />
 
       <FlatList
@@ -82,17 +79,20 @@ export function ClientsScreen() {
         renderItem={({ item }: { item: (typeof filtered)[number] }) => (
           <Pressable
             onPress={() =>
-              navigation.navigate("ClientForm", { clientId: item.id })
+              router.push({
+                pathname: "/(app)/clients/form",
+                params: { clientId: item.id },
+              })
             }
           >
             <Card>
-              <Text style={{ fontWeight: "700", fontSize: 16, color: colors.text }}>
+              <Text style={{ fontWeight: "700", fontSize: 16, color: colors.label }}>
                 {item.firstName} {item.lastName}
               </Text>
-              <Text style={{ color: colors.textSecondary, marginTop: 4 }}>
+              <Text style={{ color: colors.secondaryLabel, marginTop: 4 }}>
                 {item.city}, {item.region} · {item.countryCode}
               </Text>
-              <Text style={{ color: colors.primary, marginTop: 4, fontSize: 12 }}>
+              <Text style={{ color: colors.tint, marginTop: 4, fontSize: 12 }}>
                 {item.ianaTz}
               </Text>
             </Card>

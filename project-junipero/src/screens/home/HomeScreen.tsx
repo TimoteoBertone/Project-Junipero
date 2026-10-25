@@ -44,24 +44,24 @@ export function HomeScreen() {
       <Subtitle>{t("home.artHint")}</Subtitle>
 
       <Card>
-        <Text style={{ fontWeight: "700", color: colors.text, marginBottom: 8 }}>
+        <Text style={{ fontWeight: "700", color: colors.label, marginBottom: 8 }}>
           {t("home.calendar")}
         </Text>
         {markedDays.length === 0 ? (
-          <Text style={{ color: colors.textSecondary }}>—</Text>
+          <Text style={{ color: colors.secondaryLabel }}>—</Text>
         ) : (
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
             {markedDays.map((d) => (
               <View
                 key={d}
                 style={{
-                  backgroundColor: colors.primaryMuted,
+                  backgroundColor: colors.tintMuted,
                   paddingHorizontal: 10,
                   paddingVertical: 6,
                   borderRadius: 8,
                 }}
               >
-                <Text style={{ color: colors.primary, fontWeight: "600" }}>{d}</Text>
+                <Text style={{ color: colors.tint, fontWeight: "600" }}>{d}</Text>
               </View>
             ))}
           </View>
@@ -79,16 +79,16 @@ export function HomeScreen() {
             : "—";
           return (
             <Card>
-              <Text style={{ fontSize: 17, fontWeight: "700", color: colors.text }}>
+              <Text style={{ fontSize: 17, fontWeight: "700", color: colors.label }}>
                 {name}
               </Text>
-              <Text style={{ color: colors.textSecondary, marginTop: 4 }}>
+              <Text style={{ color: colors.secondaryLabel, marginTop: 4 }}>
                 {t("home.localVsOrigin", {
                   art: formatArt(item.startsAtUtc),
                   origin: formatClientLocal(item.startsAtUtc, item.clientIanaTz),
                 })}
               </Text>
-              <Text style={{ color: colors.primary, marginTop: 6, fontWeight: "600" }}>
+              <Text style={{ color: colors.tint, marginTop: 6, fontWeight: "600" }}>
                 {t(`status.${item.status}`)} · {item.durationMin} min
               </Text>
             </Card>

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Alert, ScrollView, Text, View } from "react-native";
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   Button,
@@ -25,7 +25,6 @@ import {
   RecurrenceMode,
   ReminderOffset,
 } from "../../types/models";
-import { AppointmentsStackParamList } from "../../navigation/types";
 
 const RECURRENCE: RecurrenceMode[] = [
   "once",
@@ -44,9 +43,10 @@ const STATUSES: AppointmentStatus[] = [
 
 export function AppointmentFormScreen() {
   const { t } = useTranslation();
-  const navigation = useNavigation();
-  const route =
-    useRoute<RouteProp<AppointmentsStackParamList, "AppointmentForm">>();
+  const router = useRouter();
+  const params = useLocalSearchParams<{ appointmentId?: string }>();
+  const appointmentId =
+    typeof params.appointmentId === "string" ? params.appointmentId : undefined;
   const {
     appointments,
     clients,
@@ -55,9 +55,7 @@ export function AppointmentFormScreen() {
     cancelOccurrence,
   } = useAppStore();
 
-  const existing = appointments.find(
-    (a) => a.id === route.params?.appointmentId
-  );
+  const existing = appointments.find((a) => a.id === appointmentId);
 
   const [clientId, setClientId] = useState(
     existing?.clientId ?? clients[0]?.id ?? ""
@@ -104,8 +102,6 @@ export function AppointmentFormScreen() {
     }
     const duration = Number(durationMin) || 50;
     try {
-      // Persist UTC + snapshot of client IANA TZ (DST-safe).
-      // Overlap is validated exclusively in ART inside the store.
       await upsertAppointment({
         ...(existing?.id ? { id: existing.id } : {}),
         clientId,
@@ -121,7 +117,7 @@ export function AppointmentFormScreen() {
         exceptionOf: existing?.exceptionOf,
         originalStartsAtUtc: existing?.originalStartsAtUtc,
       });
-      navigation.goBack();
+      router.back();
     } catch (e) {
       Alert.alert(
         t("appointments.overlapError"),
@@ -139,7 +135,7 @@ export function AppointmentFormScreen() {
         style: "destructive",
         onPress: async () => {
           await cancelOccurrence(existing.id);
-          navigation.goBack();
+          router.back();
         },
       },
     ]);
@@ -153,7 +149,7 @@ export function AppointmentFormScreen() {
         </Title>
         <Subtitle>{t("appointments.seriesNote")}</Subtitle>
 
-        <Text style={{ color: colors.textSecondary, marginBottom: 8, fontWeight: "600" }}>
+        <Text style={{ color: colors.secondaryLabel, marginBottom: 8, fontWeight: "600" }}>
           {t("appointments.client")}
         </Text>
         <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
@@ -169,11 +165,11 @@ export function AppointmentFormScreen() {
 
         {selectedClient && (
           <Card>
-            <Text style={{ color: colors.text }}>
+            <Text style={{ color: colors.label }}>
               Client TZ: {selectedClient.ianaTz}
             </Text>
             {previewUtc && (
-              <Text style={{ color: colors.textSecondary, marginTop: 4 }}>
+              <Text style={{ color: colors.secondaryLabel, marginTop: 4 }}>
                 ART {formatArt(previewUtc)} · origin{" "}
                 {formatClientLocal(previewUtc, selectedClient.ianaTz)}
               </Text>
@@ -194,7 +190,7 @@ export function AppointmentFormScreen() {
           keyboardType="numeric"
         />
 
-        <Text style={{ color: colors.textSecondary, marginBottom: 8, fontWeight: "600" }}>
+        <Text style={{ color: colors.secondaryLabel, marginBottom: 8, fontWeight: "600" }}>
           {t("appointments.recurrence")}
         </Text>
         <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
@@ -216,7 +212,7 @@ export function AppointmentFormScreen() {
           />
         )}
 
-        <Text style={{ color: colors.textSecondary, marginBottom: 8, fontWeight: "600" }}>
+        <Text style={{ color: colors.secondaryLabel, marginBottom: 8, fontWeight: "600" }}>
           {t("appointments.reminder")}
         </Text>
         <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
@@ -230,7 +226,7 @@ export function AppointmentFormScreen() {
           ))}
         </View>
 
-        <Text style={{ color: colors.textSecondary, marginBottom: 8, fontWeight: "600" }}>
+        <Text style={{ color: colors.secondaryLabel, marginBottom: 8, fontWeight: "600" }}>
           {t("appointments.status")}
         </Text>
         <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
@@ -255,7 +251,7 @@ export function AppointmentFormScreen() {
         <Button
           label={t("common.cancel")}
           variant="ghost"
-          onPress={() => navigation.goBack()}
+          onPress={() => router.back()}
         />
       </ScrollView>
     </Screen>

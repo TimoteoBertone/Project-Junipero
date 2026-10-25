@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Alert, FlatList, Pressable, ScrollView, Text } from "react-native";
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   Button,
@@ -13,14 +13,14 @@ import {
 import { searchPlaces } from "../../lib/places";
 import { useAppStore } from "../../store/AppStore";
 import { colors } from "../../theme/colors";
-import { ClientsStackParamList } from "../../navigation/types";
 
 export function ClientFormScreen() {
   const { t } = useTranslation();
-  const navigation = useNavigation();
-  const route = useRoute<RouteProp<ClientsStackParamList, "ClientForm">>();
+  const router = useRouter();
+  const params = useLocalSearchParams<{ clientId?: string }>();
+  const clientId = typeof params.clientId === "string" ? params.clientId : undefined;
   const { clients, upsertClient, deleteClient } = useAppStore();
-  const existing = clients.find((c) => c.id === route.params?.clientId);
+  const existing = clients.find((c) => c.id === clientId);
 
   const [firstName, setFirstName] = useState(existing?.firstName ?? "");
   const [lastName, setLastName] = useState(existing?.lastName ?? "");
@@ -67,7 +67,7 @@ export function ClientFormScreen() {
       ianaTz,
       placeId: placeId || undefined,
     });
-    navigation.goBack();
+    router.back();
   };
 
   const onDelete = () => {
@@ -79,7 +79,7 @@ export function ClientFormScreen() {
         style: "destructive",
         onPress: async () => {
           await deleteClient(existing.id);
-          navigation.goBack();
+          router.back();
         },
       },
     ]);
@@ -136,10 +136,10 @@ export function ClientFormScreen() {
                   }}
                   style={{ paddingVertical: 10 }}
                 >
-                  <Text style={{ color: colors.text, fontWeight: "600" }}>
+                  <Text style={{ color: colors.label, fontWeight: "600" }}>
                     {item.label}
                   </Text>
-                  <Text style={{ color: colors.primary, fontSize: 12 }}>
+                  <Text style={{ color: colors.tint, fontSize: 12 }}>
                     {item.ianaTz}
                   </Text>
                 </Pressable>
@@ -150,13 +150,13 @@ export function ClientFormScreen() {
 
         {!!ianaTz && (
           <Card>
-            <Text style={{ color: colors.textSecondary }}>
+            <Text style={{ color: colors.secondaryLabel }}>
               {t("clients.country")}: {countryCode}
             </Text>
-            <Text style={{ color: colors.textSecondary, marginTop: 4 }}>
+            <Text style={{ color: colors.secondaryLabel, marginTop: 4 }}>
               {city}, {region}
             </Text>
-            <Text style={{ color: colors.primary, marginTop: 4, fontWeight: "700" }}>
+            <Text style={{ color: colors.tint, marginTop: 4, fontWeight: "700" }}>
               {t("clients.tz")}: {ianaTz}
             </Text>
           </Card>
@@ -179,7 +179,7 @@ export function ClientFormScreen() {
         <Button
           label={t("common.cancel")}
           variant="ghost"
-          onPress={() => navigation.goBack()}
+          onPress={() => router.back()}
         />
       </ScrollView>
     </Screen>

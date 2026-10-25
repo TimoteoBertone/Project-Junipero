@@ -8,61 +8,42 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../theme/colors";
-import { AdaptiveGlass, AdaptiveGlassContainer } from "./Glass";
 
 const isIOS = Platform.OS === "ios";
 
+/**
+ * Content screen — Apple HIG grouped background.
+ * Navigation chrome (Liquid Glass tab / nav bars) is system-drawn; do not
+ * overlay custom glass on the tab bar.
+ */
 export function Screen({
   children,
   style,
-  glassGroup = true,
+  grouped = true,
 }: {
   children: React.ReactNode;
   style?: ViewStyle;
-  glassGroup?: boolean;
+  grouped?: boolean;
 }) {
   const insets = useSafeAreaInsets();
-  // Extra bottom space for the floating glass tab bar on iOS
-  const bottomPad = insets.bottom + (isIOS ? 72 : 12);
-  const content = (
+  return (
     <View
       style={[
-        styles.screenContent,
-        { paddingTop: Math.max(insets.top, 12), paddingBottom: bottomPad },
+        styles.screen,
+        {
+          backgroundColor: grouped ? colors.groupedBackground : colors.background,
+          paddingTop: isIOS ? 8 : Math.max(insets.top, 12),
+          // Leave room for the floating native tab bar
+          paddingBottom: insets.bottom + (isIOS ? 8 : 12),
+        },
         style,
       ]}
     >
-      {glassGroup && isIOS ? (
-        <AdaptiveGlassContainer style={{ flex: 1 }} spacing={18}>
-          {children}
-        </AdaptiveGlassContainer>
-      ) : (
-        children
-      )}
+      {children}
     </View>
   );
-
-  if (isIOS) {
-    return (
-      <View style={styles.screenRoot}>
-        <LinearGradient
-          colors={["#DCE8F8", "#E8EEF7", "#F3E9F4", "#D7E6F7"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={StyleSheet.absoluteFill}
-        />
-        {/* Soft orbs so Liquid Glass / blur has something to refract */}
-        <View style={[styles.orb, styles.orbOne]} />
-        <View style={[styles.orb, styles.orbTwo]} />
-        {content}
-      </View>
-    );
-  }
-
-  return <View style={[styles.screenRoot, styles.androidScreen]}>{content}</View>;
 }
 
 export function Title({ children }: { children: React.ReactNode }) {
@@ -73,6 +54,7 @@ export function Subtitle({ children }: { children: React.ReactNode }) {
   return <Text style={styles.subtitle}>{children}</Text>;
 }
 
+/** Inset grouped card — Apple secondarySystemGroupedBackground. */
 export function Card({
   children,
   style,
@@ -80,15 +62,7 @@ export function Card({
   children: React.ReactNode;
   style?: ViewStyle;
 }) {
-  return (
-    <AdaptiveGlass
-      style={[styles.card, style]}
-      contentStyle={styles.cardContent}
-      glassEffectStyle="regular"
-    >
-      {children}
-    </AdaptiveGlass>
-  );
+  return <View style={[styles.card, style]}>{children}</View>;
 }
 
 export function Field({
@@ -115,47 +89,34 @@ export function Field({
   return (
     <View style={styles.field}>
       <Text style={styles.label}>{label}</Text>
-      {isIOS ? (
-        <AdaptiveGlass
-          style={styles.fieldGlass}
-          contentStyle={styles.fieldGlassInner}
-          glassEffectStyle="clear"
-        >
-          <TextInput
-            value={value}
-            onChangeText={onChangeText}
-            placeholder={placeholder}
-            placeholderTextColor={colors.textSecondary}
-            secureTextEntry={secureTextEntry}
-            multiline={multiline}
-            keyboardType={keyboardType}
-            autoComplete={autoComplete}
-            textContentType={textContentType}
-            style={[styles.inputIOS, multiline && styles.inputMultiline]}
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-        </AdaptiveGlass>
-      ) : (
+      <View style={styles.inputShell}>
         <TextInput
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={colors.textSecondary}
+          placeholderTextColor={colors.tertiaryLabel}
           secureTextEntry={secureTextEntry}
           multiline={multiline}
           keyboardType={keyboardType}
           autoComplete={autoComplete}
           textContentType={textContentType}
-          style={[styles.inputAndroid, multiline && styles.inputMultiline]}
+          style={[styles.input, multiline && styles.inputMultiline]}
           autoCapitalize="none"
           autoCorrect={false}
+          clearButtonMode={isIOS ? "while-editing" : undefined}
         />
-      )}
+      </View>
     </View>
   );
 }
 
+/**
+ * Buttons — Apple HIG:
+ * - primary → borderedProminent (filled tint)
+ * - secondary → bordered (outline / gray fill)
+ * - danger → filled destructive
+ * - ghost → plain
+ */
 export function Button({
   label,
   onPress,
@@ -167,94 +128,27 @@ export function Button({
   variant?: "primary" | "secondary" | "danger" | "ghost";
   disabled?: boolean;
 }) {
-  if (isIOS) {
-    if (variant === "ghost") {
-      return (
-        <Pressable
-          onPress={onPress}
-          disabled={disabled}
-          style={({ pressed }) => [
-            styles.buttonGhostIOS,
-            (pressed || disabled) && { opacity: 0.55 },
-          ]}
-          accessibilityRole="button"
-        >
-          <Text style={styles.buttonGhostTextIOS}>{label}</Text>
-        </Pressable>
-      );
-    }
-
-    if (variant === "primary") {
-      return (
-        <Pressable
-          onPress={onPress}
-          disabled={disabled}
-          style={({ pressed }) => [
-            styles.buttonPrimaryIOS,
-            (pressed || disabled) && { opacity: 0.72 },
-          ]}
-          accessibilityRole="button"
-        >
-          <Text style={styles.buttonPrimaryTextIOS}>{label}</Text>
-        </Pressable>
-      );
-    }
-
-    if (variant === "danger") {
-      return (
-        <Pressable
-          onPress={onPress}
-          disabled={disabled}
-          style={({ pressed }) => [
-            styles.buttonDangerIOS,
-            (pressed || disabled) && { opacity: 0.72 },
-          ]}
-          accessibilityRole="button"
-        >
-          <Text style={styles.buttonDangerTextIOS}>{label}</Text>
-        </Pressable>
-      );
-    }
-
-    // secondary → interactive liquid glass button
-    return (
-      <AdaptiveGlass
-        isInteractive
-        glassEffectStyle="regular"
-        style={[styles.buttonGlassOuter, disabled && { opacity: 0.55 }]}
-        contentStyle={styles.buttonGlassInner}
-      >
-        <Pressable
-          onPress={onPress}
-          disabled={disabled}
-          style={styles.buttonPressFill}
-          accessibilityRole="button"
-        >
-          <Text style={styles.buttonGlassText}>{label}</Text>
-        </Pressable>
-      </AdaptiveGlass>
-    );
-  }
-
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
-      style={({ pressed }) => [
-        styles.buttonAndroid,
-        variant === "primary" && styles.buttonPrimaryAndroid,
-        variant === "secondary" && styles.buttonSecondaryAndroid,
-        variant === "danger" && styles.buttonDangerAndroid,
-        variant === "ghost" && styles.buttonGhostAndroid,
-        (pressed || disabled) && { opacity: 0.7 },
-      ]}
       accessibilityRole="button"
+      style={({ pressed }) => [
+        styles.buttonBase,
+        variant === "primary" && styles.buttonPrimary,
+        variant === "secondary" && styles.buttonSecondary,
+        variant === "danger" && styles.buttonDanger,
+        variant === "ghost" && styles.buttonGhost,
+        (pressed || disabled) && { opacity: 0.55 },
+      ]}
     >
       <Text
         style={[
-          styles.buttonTextAndroid,
-          variant === "secondary" && { color: colors.text },
-          variant === "ghost" && { color: colors.primary },
+          styles.buttonLabel,
+          variant === "primary" && styles.buttonLabelOnTint,
+          variant === "secondary" && styles.buttonLabelTint,
+          variant === "danger" && styles.buttonLabelOnTint,
+          variant === "ghost" && styles.buttonLabelTint,
         ]}
       >
         {label}
@@ -272,29 +166,11 @@ export function Chip({
   selected?: boolean;
   onPress?: () => void;
 }) {
-  if (isIOS) {
-    return (
-      <AdaptiveGlass
-        isInteractive
-        glassEffectStyle={selected ? "regular" : "clear"}
-        style={[styles.chipGlass, selected && styles.chipGlassSelected]}
-        contentStyle={styles.chipGlassInner}
-      >
-        <Pressable onPress={onPress} accessibilityRole="button">
-          <Text
-            style={[styles.chipText, selected && styles.chipTextSelectedIOS]}
-          >
-            {label}
-          </Text>
-        </Pressable>
-      </AdaptiveGlass>
-    );
-  }
-
   return (
     <Pressable
       onPress={onPress}
-      style={[styles.chipAndroid, selected && styles.chipSelectedAndroid]}
+      accessibilityRole="button"
+      style={[styles.chip, selected && styles.chipSelected]}
     >
       <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
         {label}
@@ -308,182 +184,108 @@ export function Empty({ children }: { children: React.ReactNode }) {
 }
 
 const styles = StyleSheet.create({
-  screenRoot: { flex: 1 },
-  androidScreen: { backgroundColor: colors.background },
-  screenContent: {
+  screen: {
     flex: 1,
     paddingHorizontal: 16,
   },
-  orb: {
-    position: "absolute",
-    width: 220,
-    height: 220,
-    borderRadius: 110,
-    opacity: 0.55,
-  },
-  orbOne: {
-    top: -40,
-    right: -60,
-    backgroundColor: "rgba(120, 170, 255, 0.55)",
-  },
-  orbTwo: {
-    bottom: 120,
-    left: -80,
-    backgroundColor: "rgba(210, 160, 255, 0.4)",
-  },
   title: {
     fontSize: isIOS ? 34 : 28,
-    fontWeight: isIOS ? "700" : "700",
+    fontWeight: "700",
     letterSpacing: isIOS ? 0.37 : 0,
-    color: colors.text,
+    color: colors.label,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 15,
-    color: colors.textSecondary,
-    marginBottom: 18,
     lineHeight: 20,
+    color: colors.secondaryLabel,
+    marginBottom: 16,
   },
   card: {
-    marginBottom: 12,
-  },
-  cardContent: {
+    backgroundColor: colors.secondaryGrouped,
+    borderRadius: isIOS ? 12 : 16,
     padding: 16,
+    marginBottom: 12,
+    ...Platform.select({
+      ios: {},
+      default: {
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: colors.border,
+      },
+    }),
   },
   field: { marginBottom: 12 },
   label: {
     fontSize: 13,
-    color: colors.textSecondary,
-    marginBottom: 6,
     fontWeight: "600",
+    color: colors.secondaryLabel,
+    marginBottom: 6,
     marginLeft: 4,
   },
-  fieldGlass: { marginBottom: 0 },
-  fieldGlassInner: { paddingHorizontal: 4, paddingVertical: 2 },
-  inputIOS: {
-    paddingHorizontal: 10,
-    paddingVertical: 12,
-    color: colors.text,
-    fontSize: 17,
-  },
-  inputAndroid: {
-    backgroundColor: colors.surfaceAlt,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    color: colors.text,
-    borderWidth: StyleSheet.hairlineWidth,
+  inputShell: {
+    backgroundColor: colors.secondaryGrouped,
+    borderRadius: isIOS ? 12 : 10,
+    borderWidth: isIOS ? 0 : StyleSheet.hairlineWidth,
     borderColor: colors.border,
+    overflow: "hidden",
   },
-  inputMultiline: { minHeight: 80, textAlignVertical: "top" },
+  input: {
+    paddingHorizontal: 14,
+    paddingVertical: isIOS ? 14 : 12,
+    color: colors.label,
+    fontSize: isIOS ? 17 : 16,
+  },
+  inputMultiline: { minHeight: 88, textAlignVertical: "top" },
 
-  // iOS buttons
-  buttonPrimaryIOS: {
-    backgroundColor: colors.primary,
-    borderRadius: 14,
-    paddingVertical: 15,
+  buttonBase: {
+    minHeight: isIOS ? 50 : 48,
+    borderRadius: isIOS ? 14 : 24,
     alignItems: "center",
+    justifyContent: "center",
     marginTop: 10,
-    minHeight: 50,
-    justifyContent: "center",
-  },
-  buttonPrimaryTextIOS: {
-    color: "#FFFFFF",
-    fontSize: 17,
-    fontWeight: "600",
-  },
-  buttonDangerIOS: {
-    backgroundColor: colors.danger,
-    borderRadius: 14,
-    paddingVertical: 15,
-    alignItems: "center",
-    marginTop: 10,
-    minHeight: 50,
-    justifyContent: "center",
-  },
-  buttonDangerTextIOS: {
-    color: "#FFFFFF",
-    fontSize: 17,
-    fontWeight: "600",
-  },
-  buttonGhostIOS: {
-    paddingVertical: 14,
-    alignItems: "center",
-    marginTop: 6,
-    minHeight: 44,
-    justifyContent: "center",
-  },
-  buttonGhostTextIOS: {
-    color: colors.primary,
-    fontSize: 17,
-    fontWeight: "600",
-  },
-  buttonGlassOuter: {
-    marginTop: 10,
-    borderRadius: 14,
-    minHeight: 50,
-  },
-  buttonGlassInner: {
-    padding: 0,
-    minHeight: 50,
-    justifyContent: "center",
-  },
-  buttonPressFill: {
-    minHeight: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 14,
     paddingHorizontal: 16,
   },
-  buttonGlassText: {
-    color: colors.text,
-    fontSize: 17,
+  buttonPrimary: {
+    backgroundColor: colors.tint,
+  },
+  buttonSecondary: {
+    backgroundColor: isIOS ? "rgba(120,120,128,0.16)" : colors.chip,
+  },
+  buttonDanger: {
+    backgroundColor: colors.danger,
+  },
+  buttonGhost: {
+    backgroundColor: "transparent",
+    minHeight: 44,
+  },
+  buttonLabel: {
+    fontSize: isIOS ? 17 : 16,
     fontWeight: "600",
   },
+  buttonLabelOnTint: { color: "#FFFFFF" },
+  buttonLabelTint: { color: colors.tint },
 
-  // Android buttons
-  buttonAndroid: {
-    borderRadius: 24,
-    paddingVertical: 13,
-    alignItems: "center",
-    marginTop: 8,
-    minHeight: 48,
-    justifyContent: "center",
-  },
-  buttonPrimaryAndroid: { backgroundColor: colors.primary },
-  buttonSecondaryAndroid: { backgroundColor: colors.chip },
-  buttonDangerAndroid: { backgroundColor: colors.danger },
-  buttonGhostAndroid: { backgroundColor: "transparent" },
-  buttonTextAndroid: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 16,
-  },
-
-  chipGlass: {
-    marginRight: 8,
-    marginBottom: 8,
-    borderRadius: 999,
-  },
-  chipGlassSelected: {},
-  chipGlassInner: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  chipAndroid: {
+  chip: {
     backgroundColor: colors.chip,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 999,
     marginRight: 8,
     marginBottom: 8,
   },
-  chipSelectedAndroid: { backgroundColor: colors.primary },
-  chipText: { color: colors.text, fontWeight: "600", fontSize: 13 },
-  chipTextSelected: { color: "#fff" },
-  chipTextSelectedIOS: { color: colors.primary },
+  chipSelected: {
+    backgroundColor: colors.tintMuted,
+  },
+  chipText: {
+    color: colors.label,
+    fontWeight: "600",
+    fontSize: 13,
+  },
+  chipTextSelected: {
+    color: colors.tint,
+  },
   empty: {
-    color: colors.textSecondary,
+    color: colors.secondaryLabel,
     textAlign: "center",
     marginTop: 32,
     fontSize: 15,
