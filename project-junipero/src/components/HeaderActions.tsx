@@ -3,9 +3,11 @@ import { Platform } from "react-native";
 import { Stack } from "expo-router";
 
 /**
- * Native header actions — Apple HIG / Liquid Glass.
- * Use Stack.Toolbar so iOS draws system bar buttons (SF Symbols + glass),
- * instead of custom Pressable "+" text which breaks rail / glass chrome.
+ * Native header actions — Apple HIG / Liquid Glass (WWDC25).
+ * - Add: SF Symbol `plus` with `prominent` so it gets its own tinted glass capsule
+ *   (not grouped with plain image items).
+ * - Save: system `done` role.
+ * @see https://developer.apple.com/documentation/uikit/uibarbuttonitem/style-swift.enum/prominent
  * @see https://docs.expo.dev/router/advanced/stack-toolbar/
  */
 export function HeaderAddButton({
@@ -23,6 +25,7 @@ export function HeaderAddButton({
       {Platform.OS === "ios" ? (
         <Stack.Toolbar.Button
           icon="plus"
+          variant="prominent"
           onPress={onPress}
           accessibilityLabel={accessibilityLabel}
         />

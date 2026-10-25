@@ -16,6 +16,7 @@ import {
 import { useAdaptiveLayout } from "../layout/adaptive";
 import { colors } from "../theme/colors";
 import { typography } from "../theme/typography";
+export { AppButton as Button } from "./AppButton";
 
 const isIOS = Platform.OS === "ios";
 const NAV_BAR_CONTENT = 44;
@@ -337,51 +338,6 @@ export function Field({
   );
 }
 
-/**
- * Buttons — Apple HIG:
- * primary = prominent filled; secondary = gray fill; danger = destructive fill; ghost = plain.
- * Prefer one prominent button per view.
- */
-export function Button({
-  label,
-  onPress,
-  variant = "primary",
-  disabled,
-}: {
-  label: string;
-  onPress: () => void;
-  variant?: "primary" | "secondary" | "danger" | "ghost";
-  disabled?: boolean;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-      accessibilityRole="button"
-      style={({ pressed }) => [
-        styles.buttonBase,
-        variant === "primary" && styles.buttonPrimary,
-        variant === "secondary" && styles.buttonSecondary,
-        variant === "danger" && styles.buttonDanger,
-        variant === "ghost" && styles.buttonGhost,
-        (pressed || disabled) && { opacity: 0.45 },
-      ]}
-    >
-      <Text
-        style={[
-          typography.headline,
-          variant === "primary" && styles.buttonLabelOnTint,
-          variant === "secondary" && styles.buttonLabelTint,
-          variant === "danger" && styles.buttonLabelOnTint,
-          variant === "ghost" && styles.buttonLabelTint,
-        ]}
-      >
-        {label}
-      </Text>
-    </Pressable>
-  );
-}
-
 export function Chip({
   label,
   selected,
@@ -585,26 +541,6 @@ const styles = StyleSheet.create({
     color: colors.label,
   },
   inputMultiline: { minHeight: 88, textAlignVertical: "top" },
-
-  // Apple HIG buttons: ≥44pt hit target; style (not size) marks prominence.
-  buttonBase: {
-    minHeight: 50,
-    borderRadius: isIOS ? 12 : 24,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 12,
-    paddingHorizontal: 20,
-  },
-  buttonPrimary: { backgroundColor: colors.tint },
-  buttonSecondary: { backgroundColor: colors.fill },
-  buttonDanger: { backgroundColor: colors.danger },
-  buttonGhost: {
-    backgroundColor: "transparent",
-    minHeight: 44,
-    marginTop: 4,
-  },
-  buttonLabelOnTint: { color: "#FFFFFF" },
-  buttonLabelTint: { color: colors.tint },
 
   chipRow: {
     flexDirection: "row",
