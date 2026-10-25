@@ -9,11 +9,15 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import { HeaderHeightContext } from "@react-navigation/elements";
+// Must use expo-router's fork — @react-navigation/elements is a different context
+// instance and always returns undefined under Expo Router native stacks.
+import { HeaderHeightContext } from "expo-router/build/react-navigation/elements";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../theme/colors";
 
 const isIOS = Platform.OS === "ios";
+/** UINavigationBar content row (excluding status bar). */
+const NAV_BAR_CONTENT = 44;
 
 function useOptionalHeaderHeight(): number {
   return useContext(HeaderHeightContext) ?? 0;
@@ -45,11 +49,13 @@ export function Screen({
   const insets = useSafeAreaInsets();
   const headerHeight = useOptionalHeaderHeight();
   const backgroundColor = grouped ? colors.groupedBackground : colors.background;
-  const topPad = headerAware
-    ? Math.max(headerHeight, insets.top) + 8
-    : isIOS
-      ? 0
-      : 12;
+  // Prefer measured stack header height; fall back to status bar + nav row so
+  // forms never render under the Liquid Glass bar when context is 0/stale.
+  const resolvedHeader =
+    headerHeight > insets.top
+      ? headerHeight
+      : insets.top + NAV_BAR_CONTENT;
+  const topPad = headerAware ? resolvedHeader + 8 : isIOS ? 0 : 12;
 
   if (scroll) {
     return (
