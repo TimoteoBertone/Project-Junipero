@@ -1,0 +1,95 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "clients": "Clientes",
+    "appointments": "Citas",
+    "settings": "Ajustes"
+  },
+  "auth": {
+    "title": "Therapy Agenda",
+    "subtitle": "Agenda privada para terapeutas independientes",
+    "email": "Correo",
+    "password": "Contraseña",
+    "signIn": "Iniciar sesión",
+    "signUp": "Crear cuenta",
+    "google": "Continuar con Google",
+    "apple": "Continuar con Apple",
+    "demo": "Continuar en modo demo local",
+    "or": "o"
+  },
+  "home": {
+    "title": "Hoy",
+    "artHint": "Horarios en hora de Argentina (ART)",
+    "empty": "Sin citas hoy",
+    "localVsOrigin": "ART {{art}} · origen {{origin}}",
+    "calendar": "Marcas del calendario"
+  },
+  "clients": {
+    "title": "Clientes",
+    "add": "Agregar cliente",
+    "edit": "Editar cliente",
+    "search": "Buscar clientes",
+    "filterCountry": "Filtrar por país",
+    "allCountries": "Todos los países",
+    "stats": "Distribución geográfica",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "phone": "Teléfono",
+    "email": "Email",
+    "notes": "Notas privadas",
+    "location": "Buscar ubicación",
+    "tz": "Zona IANA",
+    "country": "País",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "empty": "Todavía no hay clientes",
+    "placeHint": "Escribí una ciudad (ej. Salta, Santiago, Madrid)"
+  },
+  "appointments": {
+    "title": "Citas",
+    "add": "Nueva cita",
+    "edit": "Editar ocurrencia",
+    "client": "Consultante",
+    "when": "Fecha y hora (reloj ART)",
+    "duration": "Duración (minutos)",
+    "recurrence": "Recurrencia",
+    "reminder": "Recordatorio",
+    "status": "Estado",
+    "save": "Guardar",
+    "cancelOccurrence": "Cancelar solo esta ocurrencia",
+    "overlapError": "Este turno se solapa con otra sesión en ART",
+    "empty": "Sin citas",
+    "seriesNote": "Los cambios aplican solo a esta ocurrencia; la serie se mantiene."
+  },
+  "settings": {
+    "title": "Ajustes",
+    "profile": "Perfil del terapeuta",
+    "notifications": "Preferencias de notificación",
+    "sync": "Sincronización",
+    "syncOn": "Supabase configurado — realtime listo",
+    "syncOff": "Modo demo local — agregá EXPO_PUBLIC_SUPABASE_* para sincronizar",
+    "language": "Idioma",
+    "signOut": "Cerrar sesión",
+    "name": "Nombre visible",
+    "defaultDuration": "Duración por defecto (min)",
+    "defaultReminder": "Recordatorio por defecto"
+  },
+  "recurrence": {
+    "once": "Única vez",
+    "every_x_days": "Cada X días",
+    "weekly": "Semanal",
+    "biweekly": "Quincenal",
+    "monthly": "Mensual"
+  },
+  "status": {
+    "scheduled": "Programada",
+    "completed": "Completada",
+    "cancelled": "Cancelada",
+    "no_show": "Ausente"
+  },
+  "common": {
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "loading": "Cargando…"
+  }
+}

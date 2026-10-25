@@ -1,0 +1,95 @@
+{
+  "nav": {
+    "home": "Home",
+    "clients": "Clients",
+    "appointments": "Appointments",
+    "settings": "Settings"
+  },
+  "auth": {
+    "title": "Therapy Agenda",
+    "subtitle": "Private scheduling for independent therapists",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign in",
+    "signUp": "Create account",
+    "google": "Continue with Google",
+    "apple": "Continue with Apple",
+    "demo": "Continue in local demo mode",
+    "or": "or"
+  },
+  "home": {
+    "title": "Today",
+    "artHint": "Times shown in Argentina time (ART)",
+    "empty": "No appointments today",
+    "localVsOrigin": "ART {{art}} · origin {{origin}}",
+    "calendar": "Calendar marks"
+  },
+  "clients": {
+    "title": "Clients",
+    "add": "Add client",
+    "edit": "Edit client",
+    "search": "Search clients",
+    "filterCountry": "Filter by country",
+    "allCountries": "All countries",
+    "stats": "Geographic distribution",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Phone",
+    "email": "Email",
+    "notes": "Private notes",
+    "location": "Location search",
+    "tz": "IANA timezone",
+    "country": "Country",
+    "save": "Save",
+    "delete": "Delete",
+    "empty": "No clients yet",
+    "placeHint": "Type a city (e.g. Salta, Santiago, Madrid)"
+  },
+  "appointments": {
+    "title": "Appointments",
+    "add": "New appointment",
+    "edit": "Edit occurrence",
+    "client": "Client",
+    "when": "Date & time (ART wall clock)",
+    "duration": "Duration (minutes)",
+    "recurrence": "Recurrence",
+    "reminder": "Reminder",
+    "status": "Status",
+    "save": "Save",
+    "cancelOccurrence": "Cancel this occurrence only",
+    "overlapError": "This slot overlaps another session in ART",
+    "empty": "No appointments",
+    "seriesNote": "Edits apply only to this occurrence; the series stays intact."
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Therapist profile",
+    "notifications": "Notification preferences",
+    "sync": "Cloud sync",
+    "syncOn": "Supabase configured — realtime ready",
+    "syncOff": "Local demo mode — add EXPO_PUBLIC_SUPABASE_* to enable sync",
+    "language": "Language",
+    "signOut": "Sign out",
+    "name": "Display name",
+    "defaultDuration": "Default session length (min)",
+    "defaultReminder": "Default reminder"
+  },
+  "recurrence": {
+    "once": "One-time",
+    "every_x_days": "Every X days",
+    "weekly": "Weekly",
+    "biweekly": "Biweekly",
+    "monthly": "Monthly"
+  },
+  "status": {
+    "scheduled": "Scheduled",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "no_show": "No-show"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "loading": "Loading…"
+  }
+}
