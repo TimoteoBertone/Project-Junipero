@@ -46,6 +46,8 @@ export function Field({
   secureTextEntry,
   multiline,
   keyboardType,
+  autoComplete,
+  textContentType,
 }: {
   label: string;
   value: string;
@@ -54,6 +56,8 @@ export function Field({
   secureTextEntry?: boolean;
   multiline?: boolean;
   keyboardType?: "default" | "email-address" | "phone-pad" | "numeric";
+  autoComplete?: "email" | "password" | "off";
+  textContentType?: "emailAddress" | "password" | "none";
 }) {
   return (
     <View style={styles.field}>
@@ -66,8 +70,11 @@ export function Field({
         secureTextEntry={secureTextEntry}
         multiline={multiline}
         keyboardType={keyboardType}
+        autoComplete={autoComplete}
+        textContentType={textContentType}
         style={[styles.input, multiline && styles.inputMultiline]}
         autoCapitalize="none"
+        autoCorrect={false}
       />
     </View>
   );

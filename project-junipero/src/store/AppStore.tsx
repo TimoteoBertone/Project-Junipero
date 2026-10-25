@@ -31,6 +31,7 @@ interface AppStoreValue {
   session: AuthSession | null;
   clients: Client[];
   appointments: Appointment[];
+  establishSession: (auth: AuthSession) => Promise<void>;
   signInDemo: (email: string, displayName: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (patch: Partial<TherapistProfile>) => Promise<void>;
@@ -145,6 +146,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [appointments, clients, persist, session]
   );
 
+  const establishSession = useCallback(
+    async (auth: AuthSession) => {
+      // Keep existing local data when re-opening the same therapist account
+      const sameUser = session?.therapist.id === auth.therapist.id;
+      await commit({
+        session: auth,
+        clients: sameUser ? clients : [],
+        appointments: sameUser ? appointments : [],
+      });
+    },
+    [appointments, clients, commit, session]
+  );
+
   const signInDemo = useCallback(
     async (email: string, displayName: string) => {
       const therapistId = uid("th");
@@ -166,6 +180,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   );
 
   const signOut = useCallback(async () => {
+    try {
+      const { signOutRemote } = await import("../lib/auth");
+      await signOutRemote();
+    } catch {
+      // Local sign-out still proceeds
+    }
     await commit({ session: null, clients: [], appointments: [] });
   }, [commit]);
 
@@ -319,6 +339,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       session,
       clients,
       appointments,
+      establishSession,
       signInDemo,
       signOut,
       updateProfile,
@@ -333,6 +354,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       cancelOccurrence,
       clients,
       deleteClient,
+      establishSession,
       geoStats,
       ready,
       session,

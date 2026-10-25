@@ -10,12 +10,17 @@
     "subtitle": "Private scheduling for independent therapists",
     "email": "Email",
     "password": "Password",
+    "emailPlaceholder": "Enter your email",
+    "passwordPlaceholder": "Enter your password",
     "signIn": "Sign in",
     "signUp": "Create account",
     "google": "Continue with Google",
     "apple": "Continue with Apple",
     "demo": "Continue in local demo mode",
-    "or": "or"
+    "or": "or",
+    "errorTitle": "Sign in failed",
+    "credentialsRequired": "Email and password are required",
+    "missingKeys": "Missing auth configuration"
   },
   "home": {
     "title": "Today",

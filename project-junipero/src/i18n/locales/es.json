@@ -10,12 +10,17 @@
     "subtitle": "Agenda privada para terapeutas independientes",
     "email": "Correo",
     "password": "Contraseña",
+    "emailPlaceholder": "Ingresá tu correo",
+    "passwordPlaceholder": "Ingresá tu contraseña",
     "signIn": "Iniciar sesión",
     "signUp": "Crear cuenta",
     "google": "Continuar con Google",
     "apple": "Continuar con Apple",
     "demo": "Continuar en modo demo local",
-    "or": "o"
+    "or": "o",
+    "errorTitle": "Error al iniciar sesión",
+    "credentialsRequired": "Correo y contraseña son obligatorios",
+    "missingKeys": "Falta configuración de autenticación"
   },
   "home": {
     "title": "Hoy",
