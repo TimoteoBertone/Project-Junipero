@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Platform,
   Pressable,
@@ -9,18 +9,23 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import { HeaderHeightContext } from "@react-navigation/elements";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../theme/colors";
 
 const isIOS = Platform.OS === "ios";
 
+function useOptionalHeaderHeight(): number {
+  return useContext(HeaderHeightContext) ?? 0;
+}
+
 /**
  * Content layer only. Navigation chrome (Liquid Glass UITabBar /
  * UINavigationBar) is system-drawn.
  *
- * On iOS, NativeTabs adjusts the first nested ScrollView’s content insets so
- * content scrolls under the floating tab bar. Do NOT add large manual
- * bottom/top margins — they leave a hard empty band that clips the glass blur.
+ * On tab roots, NativeTabs adjusts ScrollView insets automatically.
+ * On pushed stack screens (forms), pass `headerAware` so content clears the
+ * Liquid Glass nav bar instead of sitting underneath it.
  * @see https://docs.expo.dev/router/advanced/native-tabs/#safe-area-handling
  */
 export function Screen({
@@ -28,14 +33,23 @@ export function Screen({
   style,
   scroll = false,
   grouped = true,
+  headerAware = false,
 }: {
   children: React.ReactNode;
   style?: ViewStyle;
   scroll?: boolean;
   grouped?: boolean;
+  /** Clear the native UINavigationBar on pushed screens (e.g. add/edit forms). */
+  headerAware?: boolean;
 }) {
   const insets = useSafeAreaInsets();
+  const headerHeight = useOptionalHeaderHeight();
   const backgroundColor = grouped ? colors.groupedBackground : colors.background;
+  const topPad = headerAware
+    ? Math.max(headerHeight, insets.top) + 8
+    : isIOS
+      ? 0
+      : 12;
 
   if (scroll) {
     return (
@@ -43,16 +57,16 @@ export function Screen({
         style={[styles.flex, { backgroundColor }]}
         contentContainerStyle={[
           styles.content,
-          // Vertical spacing comes from system content insets on iOS (tab + nav).
-          // Only keep a small trail so the last card clears the glass capsule.
           {
-            paddingTop: isIOS ? 0 : 12,
+            paddingTop: topPad,
             paddingBottom: isIOS ? 16 : Math.max(insets.bottom, 12) + 16,
           },
           style,
         ]}
-        contentInsetAdjustmentBehavior="automatic"
-        automaticallyAdjustsScrollIndicatorInsets
+        // headerAware screens pad manually; automatic would double-inset or miss
+        // the stack header when nested under NativeTabs.
+        contentInsetAdjustmentBehavior={headerAware ? "never" : "automatic"}
+        automaticallyAdjustsScrollIndicatorInsets={!headerAware}
         keyboardShouldPersistTaps="handled"
       >
         {children}
@@ -67,8 +81,7 @@ export function Screen({
         styles.content,
         {
           backgroundColor,
-          // Non-scroll screens: no fake tab-bar spacer that clips glass.
-          paddingTop: isIOS ? 0 : 12,
+          paddingTop: topPad,
           paddingBottom: isIOS ? 16 : Math.max(insets.bottom, 12) + 16,
         },
         style,

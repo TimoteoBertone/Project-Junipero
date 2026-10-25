@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useLayoutEffect, useMemo, useState } from "react";
+import { Alert, Text, View } from "react-native";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   Button,
@@ -9,7 +9,6 @@ import {
   Field,
   Screen,
   Subtitle,
-  Title,
 } from "../../components/ui";
 import { useAppStore } from "../../store/AppStore";
 import {
@@ -44,6 +43,7 @@ const STATUSES: AppointmentStatus[] = [
 export function AppointmentFormScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const navigation = useNavigation();
   const params = useLocalSearchParams<{ appointmentId?: string }>();
   const appointmentId =
     typeof params.appointmentId === "string" ? params.appointmentId : undefined;
@@ -90,6 +90,12 @@ export function AppointmentFormScreen() {
       return null;
     }
   }, [localWhen]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: existing ? t("appointments.edit") : t("appointments.add"),
+    });
+  }, [existing, navigation, t]);
 
   const save = async () => {
     if (!clientId || !selectedClient) {
@@ -142,118 +148,113 @@ export function AppointmentFormScreen() {
   };
 
   return (
-    <Screen>
-      <ScrollView keyboardShouldPersistTaps="handled">
-        <Title>
-          {existing ? t("appointments.edit") : t("appointments.add")}
-        </Title>
-        <Subtitle>{t("appointments.seriesNote")}</Subtitle>
+    <Screen scroll headerAware>
+      <Subtitle>{t("appointments.seriesNote")}</Subtitle>
 
-        <Text style={{ color: colors.secondaryLabel, marginBottom: 8, fontWeight: "600" }}>
-          {t("appointments.client")}
-        </Text>
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-          {clients.map((c) => (
-            <Chip
-              key={c.id}
-              label={`${c.firstName} ${c.lastName}`}
-              selected={clientId === c.id}
-              onPress={() => setClientId(c.id)}
-            />
-          ))}
-        </View>
+      <Text style={{ color: colors.secondaryLabel, marginBottom: 8, fontWeight: "600" }}>
+        {t("appointments.client")}
+      </Text>
+      <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+        {clients.map((c) => (
+          <Chip
+            key={c.id}
+            label={`${c.firstName} ${c.lastName}`}
+            selected={clientId === c.id}
+            onPress={() => setClientId(c.id)}
+          />
+        ))}
+      </View>
 
-        {selectedClient && (
-          <Card>
-            <Text style={{ color: colors.label }}>
-              Client TZ: {selectedClient.ianaTz}
+      {selectedClient && (
+        <Card>
+          <Text style={{ color: colors.label }}>
+            Client TZ: {selectedClient.ianaTz}
+          </Text>
+          {previewUtc && (
+            <Text style={{ color: colors.secondaryLabel, marginTop: 4 }}>
+              ART {formatArt(previewUtc)} · origin{" "}
+              {formatClientLocal(previewUtc, selectedClient.ianaTz)}
             </Text>
-            {previewUtc && (
-              <Text style={{ color: colors.secondaryLabel, marginTop: 4 }}>
-                ART {formatArt(previewUtc)} · origin{" "}
-                {formatClientLocal(previewUtc, selectedClient.ianaTz)}
-              </Text>
-            )}
-          </Card>
-        )}
+          )}
+        </Card>
+      )}
 
+      <Field
+        label={t("appointments.when")}
+        value={localWhen}
+        onChangeText={setLocalWhen}
+        placeholder="2026-10-25T15:00"
+      />
+      <Field
+        label={t("appointments.duration")}
+        value={durationMin}
+        onChangeText={setDurationMin}
+        keyboardType="numeric"
+      />
+
+      <Text style={{ color: colors.secondaryLabel, marginBottom: 8, fontWeight: "600" }}>
+        {t("appointments.recurrence")}
+      </Text>
+      <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+        {RECURRENCE.map((mode) => (
+          <Chip
+            key={mode}
+            label={t(`recurrence.${mode}`)}
+            selected={recurrenceMode === mode}
+            onPress={() => setRecurrenceMode(mode)}
+          />
+        ))}
+      </View>
+      {recurrenceMode === "every_x_days" && (
         <Field
-          label={t("appointments.when")}
-          value={localWhen}
-          onChangeText={setLocalWhen}
-          placeholder="2026-10-25T15:00"
-        />
-        <Field
-          label={t("appointments.duration")}
-          value={durationMin}
-          onChangeText={setDurationMin}
+          label="Interval (days)"
+          value={intervalDays}
+          onChangeText={setIntervalDays}
           keyboardType="numeric"
         />
+      )}
 
-        <Text style={{ color: colors.secondaryLabel, marginBottom: 8, fontWeight: "600" }}>
-          {t("appointments.recurrence")}
-        </Text>
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-          {RECURRENCE.map((mode) => (
-            <Chip
-              key={mode}
-              label={t(`recurrence.${mode}`)}
-              selected={recurrenceMode === mode}
-              onPress={() => setRecurrenceMode(mode)}
-            />
-          ))}
-        </View>
-        {recurrenceMode === "every_x_days" && (
-          <Field
-            label="Interval (days)"
-            value={intervalDays}
-            onChangeText={setIntervalDays}
-            keyboardType="numeric"
+      <Text style={{ color: colors.secondaryLabel, marginBottom: 8, fontWeight: "600" }}>
+        {t("appointments.reminder")}
+      </Text>
+      <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+        {REMINDERS.map((r) => (
+          <Chip
+            key={r}
+            label={r}
+            selected={reminderOffset === r}
+            onPress={() => setReminderOffset(r)}
           />
-        )}
+        ))}
+      </View>
 
-        <Text style={{ color: colors.secondaryLabel, marginBottom: 8, fontWeight: "600" }}>
-          {t("appointments.reminder")}
-        </Text>
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-          {REMINDERS.map((r) => (
-            <Chip
-              key={r}
-              label={r}
-              selected={reminderOffset === r}
-              onPress={() => setReminderOffset(r)}
-            />
-          ))}
-        </View>
-
-        <Text style={{ color: colors.secondaryLabel, marginBottom: 8, fontWeight: "600" }}>
-          {t("appointments.status")}
-        </Text>
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-          {STATUSES.map((s) => (
-            <Chip
-              key={s}
-              label={t(`status.${s}`)}
-              selected={status === s}
-              onPress={() => setStatus(s)}
-            />
-          ))}
-        </View>
-
-        <Button label={t("appointments.save")} onPress={save} />
-        {existing && (
-          <Button
-            label={t("appointments.cancelOccurrence")}
-            variant="danger"
-            onPress={onCancelOccurrence}
+      <Text style={{ color: colors.secondaryLabel, marginBottom: 8, fontWeight: "600" }}>
+        {t("appointments.status")}
+      </Text>
+      <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+        {STATUSES.map((s) => (
+          <Chip
+            key={s}
+            label={t(`status.${s}`)}
+            selected={status === s}
+            onPress={() => setStatus(s)}
           />
-        )}
+        ))}
+      </View>
+
+      <Button label={t("appointments.save")} onPress={save} />
+      {existing && (
         <Button
-          label={t("common.cancel")}
-          variant="ghost"
-          onPress={() => router.back()}
+          label={t("appointments.cancelOccurrence")}
+          variant="danger"
+          onPress={onCancelOccurrence}
         />
-      </ScrollView>
+      )}
+      <Button
+        label={t("common.cancel")}
+        variant="ghost"
+        onPress={() => router.back()}
+      />
     </Screen>
   );
 }

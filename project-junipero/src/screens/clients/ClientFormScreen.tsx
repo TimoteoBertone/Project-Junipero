@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from "react";
-import { Alert, FlatList, Pressable, ScrollView, Text } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useLayoutEffect, useMemo, useState } from "react";
+import { Alert, Pressable, Text } from "react-native";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   Button,
@@ -8,7 +8,6 @@ import {
   Field,
   Screen,
   Subtitle,
-  Title,
 } from "../../components/ui";
 import { searchPlaces } from "../../lib/places";
 import { useAppStore } from "../../store/AppStore";
@@ -17,6 +16,7 @@ import { colors } from "../../theme/colors";
 export function ClientFormScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const navigation = useNavigation();
   const params = useLocalSearchParams<{ clientId?: string }>();
   const clientId = typeof params.clientId === "string" ? params.clientId : undefined;
   const { clients, upsertClient, deleteClient } = useAppStore();
@@ -43,6 +43,12 @@ export function ClientFormScreen() {
     () => searchPlaces(locationQuery),
     [locationQuery]
   );
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: existing ? t("clients.edit") : t("clients.add"),
+    });
+  }, [existing, navigation, t]);
 
   const save = async () => {
     if (!firstName.trim() || !lastName.trim()) {
@@ -86,102 +92,95 @@ export function ClientFormScreen() {
   };
 
   return (
-    <Screen>
-      <ScrollView keyboardShouldPersistTaps="handled">
-        <Title>{existing ? t("clients.edit") : t("clients.add")}</Title>
-        <Subtitle>{t("clients.placeHint")}</Subtitle>
+    <Screen scroll headerAware>
+      <Subtitle>{t("clients.placeHint")}</Subtitle>
 
-        <Field label={t("clients.firstName")} value={firstName} onChangeText={setFirstName} />
-        <Field label={t("clients.lastName")} value={lastName} onChangeText={setLastName} />
-        <Field
-          label={t("clients.phone")}
-          value={phone}
-          onChangeText={setPhone}
-          keyboardType="phone-pad"
-        />
-        <Field
-          label={t("clients.email")}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-        />
-        <Field
-          label={t("clients.notes")}
-          value={notes}
-          onChangeText={setNotes}
-          multiline
-        />
-        <Field
-          label={t("clients.location")}
-          value={locationQuery}
-          onChangeText={setLocationQuery}
-          placeholder={t("clients.placeHint")}
-        />
+      <Field label={t("clients.firstName")} value={firstName} onChangeText={setFirstName} />
+      <Field label={t("clients.lastName")} value={lastName} onChangeText={setLastName} />
+      <Field
+        label={t("clients.phone")}
+        value={phone}
+        onChangeText={setPhone}
+        keyboardType="phone-pad"
+      />
+      <Field
+        label={t("clients.email")}
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+      />
+      <Field
+        label={t("clients.notes")}
+        value={notes}
+        onChangeText={setNotes}
+        multiline
+      />
+      <Field
+        label={t("clients.location")}
+        value={locationQuery}
+        onChangeText={setLocationQuery}
+        placeholder={t("clients.placeHint")}
+      />
 
-        {suggestions.length > 0 && (
-          <Card>
-            <FlatList
-              data={suggestions}
-              keyExtractor={(item) => item.placeId}
-              scrollEnabled={false}
-              renderItem={({ item }: { item: (typeof suggestions)[number] }) => (
-                <Pressable
-                  onPress={() => {
-                    setLocationQuery(item.label);
-                    setCountryCode(item.countryCode);
-                    setRegion(item.region);
-                    setCity(item.city);
-                    setIanaTz(item.ianaTz);
-                    setPlaceId(item.placeId);
-                  }}
-                  style={{ paddingVertical: 10 }}
-                >
-                  <Text style={{ color: colors.label, fontWeight: "600" }}>
-                    {item.label}
-                  </Text>
-                  <Text style={{ color: colors.tint, fontSize: 12 }}>
-                    {item.ianaTz}
-                  </Text>
-                </Pressable>
-              )}
-            />
-          </Card>
-        )}
+      {suggestions.length > 0 && (
+        <Card>
+          {suggestions.map((item) => (
+            <Pressable
+              key={item.placeId}
+              onPress={() => {
+                setLocationQuery(item.label);
+                setCountryCode(item.countryCode);
+                setRegion(item.region);
+                setCity(item.city);
+                setIanaTz(item.ianaTz);
+                setPlaceId(item.placeId);
+              }}
+              style={{ paddingVertical: 10 }}
+            >
+              <Text style={{ color: colors.label, fontWeight: "600" }}>
+                {item.label}
+              </Text>
+              <Text style={{ color: colors.tint, fontSize: 12 }}>
+                {item.ianaTz}
+              </Text>
+            </Pressable>
+          ))}
+        </Card>
+      )}
 
-        {!!ianaTz && (
-          <Card>
-            <Text style={{ color: colors.secondaryLabel }}>
-              {t("clients.country")}: {countryCode}
-            </Text>
-            <Text style={{ color: colors.secondaryLabel, marginTop: 4 }}>
-              {city}, {region}
-            </Text>
-            <Text style={{ color: colors.tint, marginTop: 4, fontWeight: "700" }}>
-              {t("clients.tz")}: {ianaTz}
-            </Text>
-          </Card>
-        )}
+      {!!ianaTz && (
+        <Card>
+          <Text style={{ color: colors.secondaryLabel }}>
+            {t("clients.country")}: {countryCode}
+          </Text>
+          <Text style={{ color: colors.secondaryLabel, marginTop: 4 }}>
+            {city}, {region}
+          </Text>
+          <Text style={{ color: colors.tint, marginTop: 4, fontWeight: "700" }}>
+            {t("clients.tz")}: {ianaTz}
+          </Text>
+        </Card>
+      )}
 
-        <Field
-          label="Street (optional)"
-          value={streetAddress}
-          onChangeText={setStreetAddress}
-        />
+      <Field
+        label="Street (optional)"
+        value={streetAddress}
+        onChangeText={setStreetAddress}
+      />
 
-        <Button label={t("clients.save")} onPress={save} />
-        {existing && (
-          <Button
-            label={t("clients.delete")}
-            variant="danger"
-            onPress={onDelete}
-          />
-        )}
+      <Button label={t("clients.save")} onPress={save} />
+      {existing && (
         <Button
-          label={t("common.cancel")}
-          variant="ghost"
-          onPress={() => router.back()}
+          label={t("clients.delete")}
+          variant="danger"
+          onPress={onDelete}
         />
-      </ScrollView>
+      )}
+      <Button
+        label={t("common.cancel")}
+        variant="ghost"
+        onPress={() => router.back()}
+      />
     </Screen>
   );
 }
