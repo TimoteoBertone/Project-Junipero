@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, {
   createContext,
   useCallback,
@@ -10,6 +9,7 @@ import React, {
 import { assertNoArtOverlap } from "../lib/overlap";
 import { scheduleAppointmentReminder } from "../lib/notifications";
 import { countryStats } from "../lib/places";
+import { appStorage } from "../lib/storage";
 import { setAppLanguage } from "../i18n";
 import {
   Appointment,
@@ -104,7 +104,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     (async () => {
       try {
-        const raw = await AsyncStorage.getItem(STORAGE_KEY);
+        const raw = await appStorage.getItem(STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw) as PersistedState;
           setSession(parsed.session);
@@ -122,7 +122,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const persist = useCallback(
     async (next: PersistedState) => {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      await appStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     },
     []
   );
