@@ -1,7 +1,8 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from "react";
-import { Alert, Pressable, Text } from "react-native";
+import { Alert } from "react-native";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { HeaderSaveButton } from "../../components/HeaderActions";
 import {
   Button,
   FormRow,
@@ -11,8 +12,6 @@ import {
 } from "../../components/ui";
 import { searchPlaces } from "../../lib/places";
 import { useAppStore } from "../../store/AppStore";
-import { colors } from "../../theme/colors";
-import { typography } from "../../theme/typography";
 
 export function ClientFormScreen() {
   const { t } = useTranslation();
@@ -89,24 +88,8 @@ export function ClientFormScreen() {
   useLayoutEffect(() => {
     navigation.setOptions({
       title: existing ? t("clients.edit") : t("clients.add"),
-      headerRight: () => (
-        <Pressable
-          onPress={save}
-          hitSlop={12}
-          accessibilityRole="button"
-          style={{
-            paddingHorizontal: 8,
-            minHeight: 44,
-            justifyContent: "center",
-          }}
-        >
-          <Text style={[typography.headline, { color: colors.tint }]}>
-            {t("clients.save")}
-          </Text>
-        </Pressable>
-      ),
     });
-  }, [existing, navigation, save, t]);
+  }, [existing, navigation, t]);
 
   const onDelete = () => {
     if (!existing) return;
@@ -124,7 +107,9 @@ export function ClientFormScreen() {
   };
 
   return (
-    <Screen scroll headerAware>
+    <>
+      <HeaderSaveButton label={t("clients.save")} onPress={save} />
+      <Screen scroll headerAware>
       <Section title={t("settings.profile")}>
         <FormRow
           label={t("clients.firstName")}
@@ -213,6 +198,7 @@ export function ClientFormScreen() {
         variant="ghost"
         onPress={() => router.back()}
       />
-    </Screen>
+      </Screen>
+    </>
   );
 }

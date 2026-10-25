@@ -1,7 +1,7 @@
-import React, { useLayoutEffect, useMemo } from "react";
-import { Pressable, Text } from "react-native";
-import { useNavigation, useRouter } from "expo-router";
+import React, { useMemo } from "react";
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { HeaderAddButton } from "../../components/HeaderActions";
 import {
   Empty,
   Footnote,
@@ -11,13 +11,10 @@ import {
 } from "../../components/ui";
 import { useAppStore } from "../../store/AppStore";
 import { formatArt, formatClientLocal, displayArtDate } from "../../lib/time";
-import { colors } from "../../theme/colors";
-import { typography } from "../../theme/typography";
 
 export function AppointmentsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const navigation = useNavigation();
   const { appointments, clients } = useAppStore();
 
   const sorted = useMemo(
@@ -28,67 +25,47 @@ export function AppointmentsScreen() {
     [appointments]
   );
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Pressable
-          onPress={() => router.push("/(app)/appointments/form")}
-          hitSlop={12}
-          accessibilityRole="button"
-          accessibilityLabel={t("appointments.add")}
-          style={{
-            paddingHorizontal: 8,
-            minWidth: 44,
-            minHeight: 44,
-            justifyContent: "center",
-          }}
-        >
-          <Text
-            style={[
-              typography.headline,
-              { color: colors.tint, fontSize: 28, fontWeight: "400" },
-            ]}
-          >
-            +
-          </Text>
-        </Pressable>
-      ),
-    });
-  }, [navigation, router, t]);
-
   return (
-    <Screen scroll>
-      <Footnote>{t("appointments.seriesNote")}</Footnote>
+    <>
+      <HeaderAddButton
+        accessibilityLabel={t("appointments.add")}
+        androidLabel={t("appointments.add")}
+        onPress={() => router.push("/(app)/appointments/form")}
+      />
 
-      <Section title={t("appointments.title")}>
-        {sorted.length === 0 ? (
-          <Empty title={t("appointments.empty")}>
-            {t("appointments.seriesNote")}
-          </Empty>
-        ) : (
-          sorted.map((item, index) => {
-            const client = clients.find((c) => c.id === item.clientId);
-            const name = client
-              ? `${client.firstName} ${client.lastName}`
-              : "—";
-            return (
-              <ListRow
-                key={item.id}
-                title={name}
-                subtitle={`${displayArtDate(item.startsAtUtc)} · ART ${formatArt(item.startsAtUtc)} · ${formatClientLocal(item.startsAtUtc, item.clientIanaTz)}`}
-                detail={t(`status.${item.status}`)}
-                last={index === sorted.length - 1}
-                onPress={() =>
-                  router.push({
-                    pathname: "/(app)/appointments/form",
-                    params: { appointmentId: item.id },
-                  })
-                }
-              />
-            );
-          })
-        )}
-      </Section>
-    </Screen>
+      <Screen scroll>
+        <Footnote>{t("appointments.seriesNote")}</Footnote>
+
+        <Section title={t("appointments.title")}>
+          {sorted.length === 0 ? (
+            <Empty title={t("appointments.empty")}>
+              {t("appointments.seriesNote")}
+            </Empty>
+          ) : (
+            sorted.map((item, index) => {
+              const client = clients.find((c) => c.id === item.clientId);
+              const name = client
+                ? `${client.firstName} ${client.lastName}`
+                : "—";
+              return (
+                <ListRow
+                  key={item.id}
+                  title={name}
+                  subtitle={`${displayArtDate(item.startsAtUtc)} · ART ${formatArt(item.startsAtUtc)} · ${formatClientLocal(item.startsAtUtc, item.clientIanaTz)}`}
+                  detail={t(`status.${item.status}`)}
+                  last={index === sorted.length - 1}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/(app)/appointments/form",
+                      params: { appointmentId: item.id },
+                    })
+                  }
+                />
+              );
+            })
+          )}
+        </Section>
+      </Screen>
+    </>
   );
 }

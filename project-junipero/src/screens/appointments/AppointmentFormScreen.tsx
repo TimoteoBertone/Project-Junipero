@@ -1,7 +1,8 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from "react";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Alert, View } from "react-native";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { HeaderSaveButton } from "../../components/HeaderActions";
 import {
   Button,
   Chip,
@@ -20,8 +21,6 @@ import {
   localInputToUtc,
   toInputLocalValue,
 } from "../../lib/time";
-import { colors } from "../../theme/colors";
-import { typography } from "../../theme/typography";
 import {
   AppointmentStatus,
   RecurrenceMode,
@@ -145,24 +144,8 @@ export function AppointmentFormScreen() {
   useLayoutEffect(() => {
     navigation.setOptions({
       title: existing ? t("appointments.edit") : t("appointments.add"),
-      headerRight: () => (
-        <Pressable
-          onPress={save}
-          hitSlop={12}
-          accessibilityRole="button"
-          style={{
-            paddingHorizontal: 8,
-            minHeight: 44,
-            justifyContent: "center",
-          }}
-        >
-          <Text style={[typography.headline, { color: colors.tint }]}>
-            {t("appointments.save")}
-          </Text>
-        </Pressable>
-      ),
     });
-  }, [existing, navigation, save, t]);
+  }, [existing, navigation, t]);
 
   const onCancelOccurrence = () => {
     if (!existing) return;
@@ -180,7 +163,9 @@ export function AppointmentFormScreen() {
   };
 
   return (
-    <Screen scroll headerAware>
+    <>
+      <HeaderSaveButton label={t("appointments.save")} onPress={save} />
+      <Screen scroll headerAware>
       <Footnote>{t("appointments.seriesNote")}</Footnote>
 
       <Section title={t("appointments.client")}>
@@ -290,6 +275,7 @@ export function AppointmentFormScreen() {
         variant="ghost"
         onPress={() => router.back()}
       />
-    </Screen>
+      </Screen>
+    </>
   );
 }

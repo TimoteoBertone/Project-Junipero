@@ -586,18 +586,23 @@ const styles = StyleSheet.create({
   },
   inputMultiline: { minHeight: 88, textAlignVertical: "top" },
 
+  // Apple HIG buttons: ≥44pt hit target; style (not size) marks prominence.
   buttonBase: {
     minHeight: 50,
-    borderRadius: isIOS ? 14 : 24,
+    borderRadius: isIOS ? 12 : 24,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
   },
   buttonPrimary: { backgroundColor: colors.tint },
   buttonSecondary: { backgroundColor: colors.fill },
   buttonDanger: { backgroundColor: colors.danger },
-  buttonGhost: { backgroundColor: "transparent", minHeight: 44 },
+  buttonGhost: {
+    backgroundColor: "transparent",
+    minHeight: 44,
+    marginTop: 4,
+  },
   buttonLabelOnTint: { color: "#FFFFFF" },
   buttonLabelTint: { color: colors.tint },
 
