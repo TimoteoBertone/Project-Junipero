@@ -11,9 +11,10 @@ import { useTranslation } from "react-i18next";
 
 /**
  * UITabBarController via Expo NativeTabs.
- * On iOS 26+ the system draws the floating Liquid Glass tab bar.
- * Apple HIG: never set custom tabBar backgrounds, blur, or shadows.
- * @see https://developer.apple.com/documentation/technologyoverviews/adopting-liquid-glass
+ * iPhone Duo (iOS 27+): system moves bars into the vertical rail; prefer a
+ * sidebar on the open/regular-width display (Apple + Expo Duo guidance).
+ * @see https://developer.apple.com/iphone-duo/prepare/
+ * @see https://expo.dev/blog/supporting-iphone-duo
  * @see https://docs.expo.dev/router/advanced/native-tabs/
  */
 export default function AppTabsLayout() {
@@ -35,6 +36,8 @@ export default function AppTabsLayout() {
         tintColor={tintColor}
         labelStyle={labelColor ? { color: labelColor } : undefined}
         minimizeBehavior="onScrollDown"
+        // Enables sidebar-adaptable tabs; on Duo open / iPad shows sidebar.
+        preferredPlacement="sidebar"
       >
         <NativeTabs.Trigger name="home">
           <NativeTabs.Trigger.Label>{t("nav.home")}</NativeTabs.Trigger.Label>

@@ -9,7 +9,11 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import { useAdaptiveLayout } from "../layout/adaptive";
 import { colors } from "../theme/colors";
 import { typography } from "../theme/typography";
 
@@ -19,8 +23,17 @@ const NAV_BAR_CONTENT = 44;
 const GROUP_RADIUS = isIOS ? 16 : 16;
 
 /**
- * Content layer only. Navigation chrome is system-drawn (Liquid Glass).
- * Pass `headerAware` on pushed stack screens so content clears the nav bar.
+ * Content layer only. Navigation chrome is system-drawn (Liquid Glass / Duo rail).
+ *
+ * iPhone Duo (Expo + Apple prepare):
+ * - Pad left/right via SafeAreaView so content clears the vertical rail
+ *   (asymmetric — never assume left === right).
+ * - Background ScrollView stays edge-to-edge for Liquid Glass refraction.
+ * - Regular-width canvases use a readable max content width (not a different app).
+ * - Pass `headerAware` on pushed stack screens so content clears the nav bar.
+ *
+ * @see https://expo.dev/blog/supporting-iphone-duo
+ * @see https://developer.apple.com/iphone-duo/prepare/
  */
 export function Screen({
   children,
@@ -36,30 +49,48 @@ export function Screen({
   headerAware?: boolean;
 }) {
   const insets = useSafeAreaInsets();
+  const { contentMaxWidth } = useAdaptiveLayout();
   const backgroundColor = grouped ? colors.groupedBackground : colors.background;
   const topPad = headerAware
     ? insets.top + NAV_BAR_CONTENT + 8
     : isIOS
       ? 0
       : 12;
+  // Bottom: NativeTabs already folds tab-bar height into insets while horizontal;
+  // do not add a fixed tab-bar spacer (Duo: bar may be vertical).
+  const bottomPad = isIOS
+    ? 24
+    : Math.max(insets.bottom, 12) + 24;
+
+  const body = (
+    <SafeAreaView
+      edges={["left", "right"]}
+      style={[
+        styles.screenPad,
+        contentMaxWidth
+          ? { width: "100%", maxWidth: contentMaxWidth, alignSelf: "center" }
+          : null,
+        style,
+      ]}
+    >
+      {children}
+    </SafeAreaView>
+  );
 
   if (scroll) {
     return (
       <ScrollView
         style={[styles.flex, { backgroundColor }]}
-        contentContainerStyle={[
-          styles.screenPad,
-          {
-            paddingTop: topPad,
-            paddingBottom: isIOS ? 24 : Math.max(insets.bottom, 12) + 24,
-          },
-          style,
-        ]}
+        contentContainerStyle={{
+          paddingTop: topPad,
+          paddingBottom: bottomPad,
+          flexGrow: 1,
+        }}
         contentInsetAdjustmentBehavior={headerAware ? "never" : "automatic"}
         automaticallyAdjustsScrollIndicatorInsets={!headerAware}
         keyboardShouldPersistTaps="handled"
       >
-        {children}
+        {body}
       </ScrollView>
     );
   }
@@ -68,16 +99,14 @@ export function Screen({
     <View
       style={[
         styles.flex,
-        styles.screenPad,
         {
           backgroundColor,
           paddingTop: topPad,
           paddingBottom: isIOS ? 16 : Math.max(insets.bottom, 12) + 16,
         },
-        style,
       ]}
     >
-      {children}
+      {body}
     </View>
   );
 }
