@@ -2,45 +2,51 @@ import React from "react";
 import {
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
   ViewStyle,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../theme/colors";
 
 const isIOS = Platform.OS === "ios";
 
 /**
- * Content screen — Apple HIG grouped background.
- * Navigation chrome (Liquid Glass tab / nav bars) is system-drawn; do not
- * overlay custom glass on the tab bar.
+ * Content layer only. Navigation chrome (Liquid Glass UITabBar /
+ * UINavigationBar) is system-drawn — content must scroll underneath so the
+ * glass can refract it (Apple WWDC25 / Adopting Liquid Glass).
  */
 export function Screen({
   children,
   style,
+  scroll = false,
   grouped = true,
 }: {
   children: React.ReactNode;
   style?: ViewStyle;
+  scroll?: boolean;
   grouped?: boolean;
 }) {
-  const insets = useSafeAreaInsets();
+  const backgroundColor = grouped ? colors.groupedBackground : colors.background;
+
+  if (scroll) {
+    return (
+      <ScrollView
+        style={[styles.flex, { backgroundColor }]}
+        contentContainerStyle={[styles.content, style]}
+        contentInsetAdjustmentBehavior="automatic"
+        scrollIndicatorInsets={{ bottom: 0 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        {children}
+      </ScrollView>
+    );
+  }
+
   return (
-    <View
-      style={[
-        styles.screen,
-        {
-          backgroundColor: grouped ? colors.groupedBackground : colors.background,
-          paddingTop: isIOS ? 8 : Math.max(insets.top, 12),
-          // Leave room for the floating native tab bar
-          paddingBottom: insets.bottom + (isIOS ? 8 : 12),
-        },
-        style,
-      ]}
-    >
+    <View style={[styles.flex, styles.content, { backgroundColor }, style]}>
       {children}
     </View>
   );
@@ -184,9 +190,13 @@ export function Empty({ children }: { children: React.ReactNode }) {
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
+  flex: { flex: 1 },
+  content: {
     paddingHorizontal: 16,
+    // Extra bottom space so last rows clear the floating Liquid Glass tab bar
+    // while still scrolling underneath it for refraction.
+    paddingBottom: isIOS ? 96 : 24,
+    paddingTop: isIOS ? 8 : 12,
   },
   title: {
     fontSize: isIOS ? 34 : 28,

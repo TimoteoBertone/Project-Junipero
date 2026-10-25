@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
-import { FlatList, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { parseISO } from "date-fns";
-import { Card, Empty, Screen, Subtitle, Title } from "../../components/ui";
+import { Card, Empty, Screen, Subtitle } from "../../components/ui";
 import { useAppStore } from "../../store/AppStore";
 import {
   artDayBoundsUtc,
@@ -39,8 +39,7 @@ export function HomeScreen() {
   }, [appointments]);
 
   return (
-    <Screen>
-      <Title>{t("home.title")}</Title>
+    <Screen scroll>
       <Subtitle>{t("home.artHint")}</Subtitle>
 
       <Card>
@@ -68,17 +67,16 @@ export function HomeScreen() {
         )}
       </Card>
 
-      <FlatList
-        data={todays}
-        keyExtractor={(item) => item.id}
-        ListEmptyComponent={<Empty>{t("home.empty")}</Empty>}
-        renderItem={({ item }: { item: (typeof todays)[number] }) => {
+      {todays.length === 0 ? (
+        <Empty>{t("home.empty")}</Empty>
+      ) : (
+        todays.map((item) => {
           const client = clients.find((c) => c.id === item.clientId);
           const name = client
             ? `${client.firstName} ${client.lastName}`
             : "—";
           return (
-            <Card>
+            <Card key={item.id}>
               <Text style={{ fontSize: 17, fontWeight: "700", color: colors.label }}>
                 {name}
               </Text>
@@ -93,8 +91,8 @@ export function HomeScreen() {
               </Text>
             </Card>
           );
-        }}
-      />
+        })
+      )}
     </Screen>
   );
 }

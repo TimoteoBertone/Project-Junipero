@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
-import { FlatList, Pressable, Text } from "react-native";
+import { Pressable, Text } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Button, Card, Empty, Screen, Subtitle, Title } from "../../components/ui";
+import { Button, Card, Empty, Screen, Subtitle } from "../../components/ui";
 import { useAppStore } from "../../store/AppStore";
 import { formatArt, formatClientLocal, displayArtDate } from "../../lib/time";
 import { recurrenceLabel } from "../../lib/recurrence";
@@ -22,8 +22,7 @@ export function AppointmentsScreen() {
   );
 
   return (
-    <Screen>
-      <Title>{t("appointments.title")}</Title>
+    <Screen scroll>
       <Subtitle>{t("appointments.seriesNote")}</Subtitle>
 
       <Button
@@ -31,18 +30,17 @@ export function AppointmentsScreen() {
         onPress={() => router.push("/(app)/appointments/form")}
       />
 
-      <FlatList
-        style={{ marginTop: 8 }}
-        data={sorted}
-        keyExtractor={(item) => item.id}
-        ListEmptyComponent={<Empty>{t("appointments.empty")}</Empty>}
-        renderItem={({ item }: { item: (typeof sorted)[number] }) => {
+      {sorted.length === 0 ? (
+        <Empty>{t("appointments.empty")}</Empty>
+      ) : (
+        sorted.map((item) => {
           const client = clients.find((c) => c.id === item.clientId);
           const name = client
             ? `${client.firstName} ${client.lastName}`
             : "—";
           return (
             <Pressable
+              key={item.id}
               onPress={() =>
                 router.push({
                   pathname: "/(app)/appointments/form",
@@ -72,8 +70,8 @@ export function AppointmentsScreen() {
               </Card>
             </Pressable>
           );
-        }}
-      />
+        })
+      )}
     </Screen>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -10,7 +10,6 @@ import {
   Field,
   Screen,
   Subtitle,
-  Title,
 } from "../../components/ui";
 import { useAppStore } from "../../store/AppStore";
 import { colors } from "../../theme/colors";
@@ -37,8 +36,7 @@ export function ClientsScreen() {
   }, [clients, country, query]);
 
   return (
-    <Screen>
-      <Title>{t("clients.title")}</Title>
+    <Screen scroll>
       <Subtitle>{t("clients.stats")}</Subtitle>
 
       <View style={{ flexDirection: "row", flexWrap: "wrap", marginBottom: 8 }}>
@@ -71,13 +69,12 @@ export function ClientsScreen() {
         onPress={() => router.push("/(app)/clients/form")}
       />
 
-      <FlatList
-        style={{ marginTop: 8 }}
-        data={filtered}
-        keyExtractor={(item) => item.id}
-        ListEmptyComponent={<Empty>{t("clients.empty")}</Empty>}
-        renderItem={({ item }: { item: (typeof filtered)[number] }) => (
+      {filtered.length === 0 ? (
+        <Empty>{t("clients.empty")}</Empty>
+      ) : (
+        filtered.map((item) => (
           <Pressable
+            key={item.id}
             onPress={() =>
               router.push({
                 pathname: "/(app)/clients/form",
@@ -97,8 +94,8 @@ export function ClientsScreen() {
               </Text>
             </Card>
           </Pressable>
-        )}
-      />
+        ))
+      )}
     </Screen>
   );
 }

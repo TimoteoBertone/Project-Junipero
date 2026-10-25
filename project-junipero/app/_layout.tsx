@@ -19,7 +19,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     if (!session && !inAuth) {
       router.replace("/(auth)/sign-in");
     } else if (session && inAuth) {
-      router.replace("/(app)");
+      router.replace("/(app)/home");
     }
   }, [ready, session, segments, router]);
 
@@ -47,7 +47,14 @@ export default function RootLayout() {
       <AppProvider>
         <StatusBar style="dark" />
         <AuthGate>
-          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.groupedBackground } }}>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              // Transparent so nested NativeTabs / UINavigationBar Liquid Glass
+              // can composite over content (Apple: no custom bar backgrounds).
+              contentStyle: { backgroundColor: colors.groupedBackground },
+            }}
+          >
             <Stack.Screen name="(auth)" />
             <Stack.Screen name="(app)" />
           </Stack>

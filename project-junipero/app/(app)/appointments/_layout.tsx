@@ -1,27 +1,18 @@
 import { Stack } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Platform } from "react-native";
-import { colors } from "../../../src/theme/colors";
+import { liquidGlassStackScreenOptions } from "../../../src/navigation/liquidGlass";
 
 export default function AppointmentsStackLayout() {
   const { t } = useTranslation();
-  const isIOS = Platform.OS === "ios";
 
   return (
-    <Stack
-      screenOptions={{
-        headerTintColor: colors.tint,
-        headerTitleStyle: { fontWeight: "600" },
-        headerTransparent: isIOS,
-        headerShadowVisible: false,
-        contentStyle: { backgroundColor: colors.groupedBackground },
-      }}
-    >
-      <Stack.Screen name="index" options={{ headerShown: false }} />
+    <Stack screenOptions={liquidGlassStackScreenOptions}>
+      <Stack.Screen name="index" options={{ title: t("appointments.title") }} />
       <Stack.Screen
         name="form"
         options={{
           title: t("appointments.add"),
+          headerLargeTitle: false,
           presentation: "card",
         }}
       />
