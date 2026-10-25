@@ -9,14 +9,19 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../theme/colors";
 
 const isIOS = Platform.OS === "ios";
 
 /**
  * Content layer only. Navigation chrome (Liquid Glass UITabBar /
- * UINavigationBar) is system-drawn — content must scroll underneath so the
- * glass can refract it (Apple WWDC25 / Adopting Liquid Glass).
+ * UINavigationBar) is system-drawn.
+ *
+ * On iOS, NativeTabs adjusts the first nested ScrollView’s content insets so
+ * content scrolls under the floating tab bar. Do NOT add large manual
+ * bottom/top margins — they leave a hard empty band that clips the glass blur.
+ * @see https://docs.expo.dev/router/advanced/native-tabs/#safe-area-handling
  */
 export function Screen({
   children,
@@ -29,15 +34,25 @@ export function Screen({
   scroll?: boolean;
   grouped?: boolean;
 }) {
+  const insets = useSafeAreaInsets();
   const backgroundColor = grouped ? colors.groupedBackground : colors.background;
 
   if (scroll) {
     return (
       <ScrollView
         style={[styles.flex, { backgroundColor }]}
-        contentContainerStyle={[styles.content, style]}
+        contentContainerStyle={[
+          styles.content,
+          // Vertical spacing comes from system content insets on iOS (tab + nav).
+          // Only keep a small trail so the last card clears the glass capsule.
+          {
+            paddingTop: isIOS ? 0 : 12,
+            paddingBottom: isIOS ? 16 : Math.max(insets.bottom, 12) + 16,
+          },
+          style,
+        ]}
         contentInsetAdjustmentBehavior="automatic"
-        scrollIndicatorInsets={{ bottom: 0 }}
+        automaticallyAdjustsScrollIndicatorInsets
         keyboardShouldPersistTaps="handled"
       >
         {children}
@@ -46,7 +61,19 @@ export function Screen({
   }
 
   return (
-    <View style={[styles.flex, styles.content, { backgroundColor }, style]}>
+    <View
+      style={[
+        styles.flex,
+        styles.content,
+        {
+          backgroundColor,
+          // Non-scroll screens: no fake tab-bar spacer that clips glass.
+          paddingTop: isIOS ? 0 : 12,
+          paddingBottom: isIOS ? 16 : Math.max(insets.bottom, 12) + 16,
+        },
+        style,
+      ]}
+    >
       {children}
     </View>
   );
@@ -192,11 +219,9 @@ export function Empty({ children }: { children: React.ReactNode }) {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   content: {
+    // Horizontal inset for grouped content only — screen background stays
+    // edge-to-edge so Liquid Glass can refract full-bleed under the tab bar.
     paddingHorizontal: 16,
-    // Extra bottom space so last rows clear the floating Liquid Glass tab bar
-    // while still scrolling underneath it for refraction.
-    paddingBottom: isIOS ? 96 : 24,
-    paddingTop: isIOS ? 8 : 12,
   },
   title: {
     fontSize: isIOS ? 34 : 28,

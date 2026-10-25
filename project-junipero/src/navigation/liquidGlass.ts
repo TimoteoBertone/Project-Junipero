@@ -15,5 +15,10 @@ export const liquidGlassStackScreenOptions = {
   headerLargeTitle: isIOS,
   headerLargeTitleStyle: isIOS ? { fontWeight: "700" as const } : undefined,
   // Never paint headerStyle.backgroundColor / headerBlurEffect on iOS 26+
-  contentStyle: { backgroundColor: colors.groupedBackground },
+  // Full-bleed content so the floating Liquid Glass tab/nav blur is not clipped
+  // by an inset content rectangle.
+  contentStyle: {
+    backgroundColor: colors.groupedBackground,
+    flex: 1,
+  },
 };
