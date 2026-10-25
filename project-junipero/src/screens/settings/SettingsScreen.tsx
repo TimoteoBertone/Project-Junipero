@@ -1,17 +1,18 @@
 import React, { useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { useTranslation } from "react-i18next";
 import {
   Button,
-  Card,
   Chip,
-  Field,
+  ChipRow,
+  Footnote,
+  FormRow,
+  ListRow,
   Screen,
-  Subtitle,
+  Section,
 } from "../../components/ui";
 import { useAppStore } from "../../store/AppStore";
 import { isSupabaseConfigured } from "../../lib/supabase";
-import { colors } from "../../theme/colors";
 import { ReminderOffset } from "../../types/models";
 
 export function SettingsScreen() {
@@ -39,72 +40,67 @@ export function SettingsScreen() {
 
   return (
     <Screen scroll>
-      <Subtitle>{therapist?.email}</Subtitle>
+      {therapist?.email ? <Footnote>{therapist.email}</Footnote> : null}
 
-      <Card>
-        <Text style={{ fontWeight: "700", color: colors.label, marginBottom: 8 }}>
-          {t("settings.profile")}
-        </Text>
-        <Field label={t("settings.name")} value={name} onChangeText={setName} />
-        <Field
+      <Section title={t("settings.profile")}>
+        <FormRow
+          label={t("settings.name")}
+          value={name}
+          onChangeText={setName}
+        />
+        <FormRow
           label={t("settings.defaultDuration")}
           value={duration}
           onChangeText={setDuration}
           keyboardType="numeric"
+          last
         />
-      </Card>
+      </Section>
 
-      <Card>
-        <Text style={{ fontWeight: "700", color: colors.label, marginBottom: 8 }}>
-          {t("settings.notifications")}
-        </Text>
-        <Text style={{ color: colors.secondaryLabel, marginBottom: 8 }}>
-          {t("settings.defaultReminder")}
-        </Text>
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-          {(["15m", "1h", "24h"] as ReminderOffset[]).map((r) => (
-            <Chip
-              key={r}
-              label={r}
-              selected={reminder === r}
-              onPress={() => setReminder(r)}
-            />
-          ))}
+      <Section title={t("settings.notifications")} footer={t("settings.defaultReminder")}>
+        <View style={{ padding: 16 }}>
+          <ChipRow>
+            {(["15m", "1h", "24h"] as ReminderOffset[]).map((r) => (
+              <Chip
+                key={r}
+                label={r}
+                selected={reminder === r}
+                onPress={() => setReminder(r)}
+              />
+            ))}
+          </ChipRow>
         </View>
-      </Card>
+      </Section>
 
-      <Card>
-        <Text style={{ fontWeight: "700", color: colors.label, marginBottom: 8 }}>
-          {t("settings.language")}
-        </Text>
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-          {(
-            [
-              ["system", "System default"],
-              ["en", "English"],
-              ["es", "Español"],
-            ] as const
-          ).map(([key, label]) => (
-            <Chip
-              key={key}
-              label={label}
-              selected={locale === key}
-              onPress={() => setLocale(key)}
-            />
-          ))}
+      <Section title={t("settings.language")}>
+        <View style={{ padding: 16 }}>
+          <ChipRow>
+            {(
+              [
+                ["system", "System"],
+                ["en", "English"],
+                ["es", "Español"],
+              ] as const
+            ).map(([key, label]) => (
+              <Chip
+                key={key}
+                label={label}
+                selected={locale === key}
+                onPress={() => setLocale(key)}
+              />
+            ))}
+          </ChipRow>
         </View>
-      </Card>
+      </Section>
 
-      <Card>
-        <Text style={{ fontWeight: "700", color: colors.label, marginBottom: 8 }}>
-          {t("settings.sync")}
-        </Text>
-        <Text style={{ color: colors.secondaryLabel }}>
-          {isSupabaseConfigured
-            ? t("settings.syncOn")
-            : t("settings.syncOff")}
-        </Text>
-      </Card>
+      <Section title={t("settings.sync")}>
+        <ListRow
+          title={
+            isSupabaseConfigured ? t("settings.syncOn") : t("settings.syncOff")
+          }
+          last
+        />
+      </Section>
 
       <Button label={t("common.confirm")} onPress={save} />
       <Button label={t("settings.signOut")} variant="danger" onPress={signOut} />

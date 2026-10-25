@@ -27,7 +27,7 @@
     "artHint": "Times shown in Argentina time (ART)",
     "empty": "No appointments today",
     "localVsOrigin": "ART {{art}} · origin {{origin}}",
-    "calendar": "Calendar marks"
+    "calendar": "Calendar Marks"
   },
   "clients": {
     "title": "Clients",
@@ -68,9 +68,9 @@
   },
   "settings": {
     "title": "Settings",
-    "profile": "Therapist profile",
-    "notifications": "Notification preferences",
-    "sync": "Cloud sync",
+    "profile": "Therapist Profile",
+    "notifications": "Notifications",
+    "sync": "Cloud Sync",
     "syncOn": "Supabase configured — realtime ready",
     "syncOff": "Local demo mode — add EXPO_PUBLIC_SUPABASE_* to enable sync",
     "language": "Language",
@@ -95,6 +95,8 @@
   "common": {
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "account": "Account",
+    "preview": "Preview"
   }
 }

@@ -27,7 +27,7 @@
     "artHint": "Horarios en hora de Argentina (ART)",
     "empty": "Sin citas hoy",
     "localVsOrigin": "ART {{art}} · origen {{origin}}",
-    "calendar": "Marcas del calendario"
+    "calendar": "Marcas del Calendario"
   },
   "clients": {
     "title": "Clientes",
@@ -68,8 +68,8 @@
   },
   "settings": {
     "title": "Ajustes",
-    "profile": "Perfil del terapeuta",
-    "notifications": "Preferencias de notificación",
+    "profile": "Perfil del Terapeuta",
+    "notifications": "Notificaciones",
     "sync": "Sincronización",
     "syncOn": "Supabase configurado — realtime listo",
     "syncOff": "Modo demo local — agregá EXPO_PUBLIC_SUPABASE_* para sincronizar",
@@ -95,6 +95,8 @@
   "common": {
     "cancel": "Cancelar",
     "confirm": "Confirmar",
-    "loading": "Cargando…"
+    "loading": "Cargando…",
+    "account": "Cuenta",
+    "preview": "Vista previa"
   }
 }

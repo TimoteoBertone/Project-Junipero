@@ -1,22 +1,24 @@
-import React, { useMemo, useState } from "react";
+import React, { useLayoutEffect, useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
-  Button,
-  Card,
   Chip,
+  ChipRow,
   Empty,
   Field,
+  ListRow,
   Screen,
-  Subtitle,
+  Section,
 } from "../../components/ui";
 import { useAppStore } from "../../store/AppStore";
 import { colors } from "../../theme/colors";
+import { typography } from "../../theme/typography";
 
 export function ClientsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const navigation = useNavigation();
   const { clients, geoStats } = useAppStore();
   const [query, setQuery] = useState("");
   const [country, setCountry] = useState<string | null>(null);
@@ -35,27 +37,57 @@ export function ClientsScreen() {
     });
   }, [clients, country, query]);
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable
+          onPress={() => router.push("/(app)/clients/form")}
+          hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel={t("clients.add")}
+          style={{
+            paddingHorizontal: 8,
+            minWidth: 44,
+            minHeight: 44,
+            justifyContent: "center",
+          }}
+        >
+          <Text
+            style={[
+              typography.headline,
+              { color: colors.tint, fontSize: 28, fontWeight: "400" },
+            ]}
+          >
+            +
+          </Text>
+        </Pressable>
+      ),
+    });
+  }, [navigation, router, t]);
+
   return (
     <Screen scroll>
-      <Subtitle>{t("clients.stats")}</Subtitle>
-
-      <View style={{ flexDirection: "row", flexWrap: "wrap", marginBottom: 8 }}>
-        <Chip
-          label={t("clients.allCountries")}
-          selected={!country}
-          onPress={() => setCountry(null)}
-        />
-        {geoStats.map((s) => (
-          <Chip
-            key={s.countryCode}
-            label={`${s.countryCode} (${s.count})`}
-            selected={country === s.countryCode}
-            onPress={() =>
-              setCountry(country === s.countryCode ? null : s.countryCode)
-            }
-          />
-        ))}
-      </View>
+      <Section title={t("clients.stats")}>
+        <View style={{ padding: 16 }}>
+          <ChipRow>
+            <Chip
+              label={t("clients.allCountries")}
+              selected={!country}
+              onPress={() => setCountry(null)}
+            />
+            {geoStats.map((s) => (
+              <Chip
+                key={s.countryCode}
+                label={`${s.countryCode} (${s.count})`}
+                selected={country === s.countryCode}
+                onPress={() =>
+                  setCountry(country === s.countryCode ? null : s.countryCode)
+                }
+              />
+            ))}
+          </ChipRow>
+        </View>
+      </Section>
 
       <Field
         label={t("clients.search")}
@@ -64,38 +96,27 @@ export function ClientsScreen() {
         placeholder={t("clients.search")}
       />
 
-      <Button
-        label={t("clients.add")}
-        onPress={() => router.push("/(app)/clients/form")}
-      />
-
-      {filtered.length === 0 ? (
-        <Empty>{t("clients.empty")}</Empty>
-      ) : (
-        filtered.map((item) => (
-          <Pressable
-            key={item.id}
-            onPress={() =>
-              router.push({
-                pathname: "/(app)/clients/form",
-                params: { clientId: item.id },
-              })
-            }
-          >
-            <Card>
-              <Text style={{ fontWeight: "700", fontSize: 16, color: colors.label }}>
-                {item.firstName} {item.lastName}
-              </Text>
-              <Text style={{ color: colors.secondaryLabel, marginTop: 4 }}>
-                {item.city}, {item.region} · {item.countryCode}
-              </Text>
-              <Text style={{ color: colors.tint, marginTop: 4, fontSize: 12 }}>
-                {item.ianaTz}
-              </Text>
-            </Card>
-          </Pressable>
-        ))
-      )}
+      <Section title={t("clients.title")}>
+        {filtered.length === 0 ? (
+          <Empty title={t("clients.empty")}>{t("clients.placeHint")}</Empty>
+        ) : (
+          filtered.map((item, index) => (
+            <ListRow
+              key={item.id}
+              title={`${item.firstName} ${item.lastName}`}
+              subtitle={`${item.city}, ${item.region} · ${item.countryCode}`}
+              detail={item.ianaTz.split("/").pop()}
+              last={index === filtered.length - 1}
+              onPress={() =>
+                router.push({
+                  pathname: "/(app)/clients/form",
+                  params: { clientId: item.id },
+                })
+              }
+            />
+          ))
+        )}
+      </Section>
     </Screen>
   );
 }

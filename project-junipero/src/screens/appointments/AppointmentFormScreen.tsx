@@ -1,14 +1,16 @@
-import React, { useLayoutEffect, useMemo, useState } from "react";
-import { Alert, Text, View } from "react-native";
+import React, { useCallback, useLayoutEffect, useMemo, useState } from "react";
+import { Alert, Pressable, Text, View } from "react-native";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   Button,
-  Card,
   Chip,
-  Field,
+  ChipRow,
+  Footnote,
+  FormRow,
+  ListRow,
   Screen,
-  Subtitle,
+  Section,
 } from "../../components/ui";
 import { useAppStore } from "../../store/AppStore";
 import {
@@ -19,6 +21,7 @@ import {
   toInputLocalValue,
 } from "../../lib/time";
 import { colors } from "../../theme/colors";
+import { typography } from "../../theme/typography";
 import {
   AppointmentStatus,
   RecurrenceMode,
@@ -91,13 +94,7 @@ export function AppointmentFormScreen() {
     }
   }, [localWhen]);
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      title: existing ? t("appointments.edit") : t("appointments.add"),
-    });
-  }, [existing, navigation, t]);
-
-  const save = async () => {
+  const save = useCallback(async () => {
     if (!clientId || !selectedClient) {
       Alert.alert("Client required", "Select a client first.");
       return;
@@ -130,7 +127,42 @@ export function AppointmentFormScreen() {
         e instanceof Error ? e.message : String(e)
       );
     }
-  };
+  }, [
+    clientId,
+    selectedClient,
+    previewUtc,
+    durationMin,
+    upsertAppointment,
+    existing,
+    status,
+    reminderOffset,
+    recurrenceMode,
+    intervalDays,
+    router,
+    t,
+  ]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: existing ? t("appointments.edit") : t("appointments.add"),
+      headerRight: () => (
+        <Pressable
+          onPress={save}
+          hitSlop={12}
+          accessibilityRole="button"
+          style={{
+            paddingHorizontal: 8,
+            minHeight: 44,
+            justifyContent: "center",
+          }}
+        >
+          <Text style={[typography.headline, { color: colors.tint }]}>
+            {t("appointments.save")}
+          </Text>
+        </Pressable>
+      ),
+    });
+  }, [existing, navigation, save, t]);
 
   const onCancelOccurrence = () => {
     if (!existing) return;
@@ -149,98 +181,101 @@ export function AppointmentFormScreen() {
 
   return (
     <Screen scroll headerAware>
-      <Subtitle>{t("appointments.seriesNote")}</Subtitle>
+      <Footnote>{t("appointments.seriesNote")}</Footnote>
 
-      <Text style={{ color: colors.secondaryLabel, marginBottom: 8, fontWeight: "600" }}>
-        {t("appointments.client")}
-      </Text>
-      <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-        {clients.map((c) => (
-          <Chip
+      <Section title={t("appointments.client")}>
+        {clients.map((c, index) => (
+          <ListRow
             key={c.id}
-            label={`${c.firstName} ${c.lastName}`}
-            selected={clientId === c.id}
+            title={`${c.firstName} ${c.lastName}`}
+            subtitle={c.ianaTz}
+            detail={clientId === c.id ? "✓" : undefined}
+            last={index === clients.length - 1}
+            showChevron={false}
             onPress={() => setClientId(c.id)}
           />
         ))}
-      </View>
+      </Section>
 
-      {selectedClient && (
-        <Card>
-          <Text style={{ color: colors.label }}>
-            Client TZ: {selectedClient.ianaTz}
-          </Text>
-          {previewUtc && (
-            <Text style={{ color: colors.secondaryLabel, marginTop: 4 }}>
-              ART {formatArt(previewUtc)} · origin{" "}
-              {formatClientLocal(previewUtc, selectedClient.ianaTz)}
-            </Text>
-          )}
-        </Card>
-      )}
-
-      <Field
-        label={t("appointments.when")}
-        value={localWhen}
-        onChangeText={setLocalWhen}
-        placeholder="2026-10-25T15:00"
-      />
-      <Field
-        label={t("appointments.duration")}
-        value={durationMin}
-        onChangeText={setDurationMin}
-        keyboardType="numeric"
-      />
-
-      <Text style={{ color: colors.secondaryLabel, marginBottom: 8, fontWeight: "600" }}>
-        {t("appointments.recurrence")}
-      </Text>
-      <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-        {RECURRENCE.map((mode) => (
-          <Chip
-            key={mode}
-            label={t(`recurrence.${mode}`)}
-            selected={recurrenceMode === mode}
-            onPress={() => setRecurrenceMode(mode)}
+      {selectedClient && previewUtc ? (
+        <Section title={t("common.preview")}>
+          <ListRow
+            title={`ART ${formatArt(previewUtc)}`}
+            subtitle={formatClientLocal(previewUtc, selectedClient.ianaTz)}
+            last
           />
-        ))}
-      </View>
-      {recurrenceMode === "every_x_days" && (
-        <Field
-          label="Interval (days)"
-          value={intervalDays}
-          onChangeText={setIntervalDays}
-          keyboardType="numeric"
+        </Section>
+      ) : null}
+
+      <Section title={t("appointments.when")}>
+        <FormRow
+          label={t("appointments.when")}
+          value={localWhen}
+          onChangeText={setLocalWhen}
+          placeholder="2026-10-25T15:00"
         />
-      )}
+        <FormRow
+          label={t("appointments.duration")}
+          value={durationMin}
+          onChangeText={setDurationMin}
+          keyboardType="numeric"
+          last
+        />
+      </Section>
 
-      <Text style={{ color: colors.secondaryLabel, marginBottom: 8, fontWeight: "600" }}>
-        {t("appointments.reminder")}
-      </Text>
-      <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-        {REMINDERS.map((r) => (
-          <Chip
-            key={r}
-            label={r}
-            selected={reminderOffset === r}
-            onPress={() => setReminderOffset(r)}
+      <Section title={t("appointments.recurrence")}>
+        <View style={{ padding: 16 }}>
+          <ChipRow>
+            {RECURRENCE.map((mode) => (
+              <Chip
+                key={mode}
+                label={t(`recurrence.${mode}`)}
+                selected={recurrenceMode === mode}
+                onPress={() => setRecurrenceMode(mode)}
+              />
+            ))}
+          </ChipRow>
+        </View>
+        {recurrenceMode === "every_x_days" ? (
+          <FormRow
+            label="Interval"
+            value={intervalDays}
+            onChangeText={setIntervalDays}
+            keyboardType="numeric"
+            last
           />
-        ))}
-      </View>
+        ) : null}
+      </Section>
 
-      <Text style={{ color: colors.secondaryLabel, marginBottom: 8, fontWeight: "600" }}>
-        {t("appointments.status")}
-      </Text>
-      <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-        {STATUSES.map((s) => (
-          <Chip
-            key={s}
-            label={t(`status.${s}`)}
-            selected={status === s}
-            onPress={() => setStatus(s)}
-          />
-        ))}
-      </View>
+      <Section title={t("appointments.reminder")}>
+        <View style={{ padding: 16 }}>
+          <ChipRow>
+            {REMINDERS.map((r) => (
+              <Chip
+                key={r}
+                label={r}
+                selected={reminderOffset === r}
+                onPress={() => setReminderOffset(r)}
+              />
+            ))}
+          </ChipRow>
+        </View>
+      </Section>
+
+      <Section title={t("appointments.status")}>
+        <View style={{ padding: 16 }}>
+          <ChipRow>
+            {STATUSES.map((s) => (
+              <Chip
+                key={s}
+                label={t(`status.${s}`)}
+                selected={status === s}
+                onPress={() => setStatus(s)}
+              />
+            ))}
+          </ChipRow>
+        </View>
+      </Section>
 
       <Button label={t("appointments.save")} onPress={save} />
       {existing && (

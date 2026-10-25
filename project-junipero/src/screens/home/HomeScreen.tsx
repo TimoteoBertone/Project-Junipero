@@ -1,8 +1,17 @@
 import React, { useMemo } from "react";
 import { Text, View } from "react-native";
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { parseISO } from "date-fns";
-import { Card, Empty, Screen, Subtitle } from "../../components/ui";
+import {
+  Chip,
+  ChipRow,
+  Empty,
+  Footnote,
+  ListRow,
+  Screen,
+  Section,
+} from "../../components/ui";
 import { useAppStore } from "../../store/AppStore";
 import {
   artDayBoundsUtc,
@@ -10,10 +19,11 @@ import {
   formatClientLocal,
   displayArtDate,
 } from "../../lib/time";
-import { colors } from "../../theme/colors";
+import { typography } from "../../theme/typography";
 
 export function HomeScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const { appointments, clients } = useAppStore();
 
   const { todays, markedDays } = useMemo(() => {
@@ -40,59 +50,54 @@ export function HomeScreen() {
 
   return (
     <Screen scroll>
-      <Subtitle>{t("home.artHint")}</Subtitle>
+      <Footnote>{t("home.artHint")}</Footnote>
 
-      <Card>
-        <Text style={{ fontWeight: "700", color: colors.label, marginBottom: 8 }}>
-          {t("home.calendar")}
-        </Text>
+      <Section title={t("home.calendar")}>
         {markedDays.length === 0 ? (
-          <Text style={{ color: colors.secondaryLabel }}>—</Text>
+          <View style={{ padding: 16 }}>
+            <Text style={typography.subheadline}>—</Text>
+          </View>
         ) : (
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-            {markedDays.map((d) => (
-              <View
-                key={d}
-                style={{
-                  backgroundColor: colors.tintMuted,
-                  paddingHorizontal: 10,
-                  paddingVertical: 6,
-                  borderRadius: 8,
-                }}
-              >
-                <Text style={{ color: colors.tint, fontWeight: "600" }}>{d}</Text>
-              </View>
-            ))}
+          <View style={{ padding: 16 }}>
+            <ChipRow>
+              {markedDays.map((d) => (
+                <Chip key={d} label={d} selected />
+              ))}
+            </ChipRow>
           </View>
         )}
-      </Card>
+      </Section>
 
-      {todays.length === 0 ? (
-        <Empty>{t("home.empty")}</Empty>
-      ) : (
-        todays.map((item) => {
-          const client = clients.find((c) => c.id === item.clientId);
-          const name = client
-            ? `${client.firstName} ${client.lastName}`
-            : "—";
-          return (
-            <Card key={item.id}>
-              <Text style={{ fontSize: 17, fontWeight: "700", color: colors.label }}>
-                {name}
-              </Text>
-              <Text style={{ color: colors.secondaryLabel, marginTop: 4 }}>
-                {t("home.localVsOrigin", {
+      <Section title={t("home.title")}>
+        {todays.length === 0 ? (
+          <Empty title={t("home.empty")}>{t("home.artHint")}</Empty>
+        ) : (
+          todays.map((item, index) => {
+            const client = clients.find((c) => c.id === item.clientId);
+            const name = client
+              ? `${client.firstName} ${client.lastName}`
+              : "—";
+            return (
+              <ListRow
+                key={item.id}
+                title={name}
+                subtitle={t("home.localVsOrigin", {
                   art: formatArt(item.startsAtUtc),
                   origin: formatClientLocal(item.startsAtUtc, item.clientIanaTz),
                 })}
-              </Text>
-              <Text style={{ color: colors.tint, marginTop: 6, fontWeight: "600" }}>
-                {t(`status.${item.status}`)} · {item.durationMin} min
-              </Text>
-            </Card>
-          );
-        })
-      )}
+                detail={`${t(`status.${item.status}`)} · ${item.durationMin}m`}
+                last={index === todays.length - 1}
+                onPress={() =>
+                  router.push({
+                    pathname: "/(app)/appointments/form",
+                    params: { appointmentId: item.id },
+                  })
+                }
+              />
+            );
+          })
+        )}
+      </Section>
     </Screen>
   );
 }

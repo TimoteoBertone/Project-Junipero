@@ -1,17 +1,18 @@
-import React, { useLayoutEffect, useMemo, useState } from "react";
+import React, { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { Alert, Pressable, Text } from "react-native";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   Button,
-  Card,
-  Field,
+  FormRow,
+  ListRow,
   Screen,
-  Subtitle,
+  Section,
 } from "../../components/ui";
 import { searchPlaces } from "../../lib/places";
 import { useAppStore } from "../../store/AppStore";
 import { colors } from "../../theme/colors";
+import { typography } from "../../theme/typography";
 
 export function ClientFormScreen() {
   const { t } = useTranslation();
@@ -44,13 +45,7 @@ export function ClientFormScreen() {
     [locationQuery]
   );
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      title: existing ? t("clients.edit") : t("clients.add"),
-    });
-  }, [existing, navigation, t]);
-
-  const save = async () => {
+  const save = useCallback(async () => {
     if (!firstName.trim() || !lastName.trim()) {
       Alert.alert("Missing name", "First and last name are required.");
       return;
@@ -74,7 +69,44 @@ export function ClientFormScreen() {
       placeId: placeId || undefined,
     });
     router.back();
-  };
+  }, [
+    firstName,
+    lastName,
+    phone,
+    email,
+    notes,
+    countryCode,
+    region,
+    city,
+    streetAddress,
+    ianaTz,
+    placeId,
+    existing,
+    upsertClient,
+    router,
+  ]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: existing ? t("clients.edit") : t("clients.add"),
+      headerRight: () => (
+        <Pressable
+          onPress={save}
+          hitSlop={12}
+          accessibilityRole="button"
+          style={{
+            paddingHorizontal: 8,
+            minHeight: 44,
+            justifyContent: "center",
+          }}
+        >
+          <Text style={[typography.headline, { color: colors.tint }]}>
+            {t("clients.save")}
+          </Text>
+        </Pressable>
+      ),
+    });
+  }, [existing, navigation, save, t]);
 
   const onDelete = () => {
     if (!existing) return;
@@ -93,80 +125,80 @@ export function ClientFormScreen() {
 
   return (
     <Screen scroll headerAware>
-      <Subtitle>{t("clients.placeHint")}</Subtitle>
+      <Section title={t("settings.profile")}>
+        <FormRow
+          label={t("clients.firstName")}
+          value={firstName}
+          onChangeText={setFirstName}
+        />
+        <FormRow
+          label={t("clients.lastName")}
+          value={lastName}
+          onChangeText={setLastName}
+        />
+        <FormRow
+          label={t("clients.phone")}
+          value={phone}
+          onChangeText={setPhone}
+          keyboardType="phone-pad"
+        />
+        <FormRow
+          label={t("clients.email")}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+        />
+        <FormRow
+          label={t("clients.notes")}
+          value={notes}
+          onChangeText={setNotes}
+          multiline
+          last
+        />
+      </Section>
 
-      <Field label={t("clients.firstName")} value={firstName} onChangeText={setFirstName} />
-      <Field label={t("clients.lastName")} value={lastName} onChangeText={setLastName} />
-      <Field
-        label={t("clients.phone")}
-        value={phone}
-        onChangeText={setPhone}
-        keyboardType="phone-pad"
-      />
-      <Field
-        label={t("clients.email")}
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
-      <Field
-        label={t("clients.notes")}
-        value={notes}
-        onChangeText={setNotes}
-        multiline
-      />
-      <Field
-        label={t("clients.location")}
-        value={locationQuery}
-        onChangeText={setLocationQuery}
-        placeholder={t("clients.placeHint")}
-      />
-
-      {suggestions.length > 0 && (
-        <Card>
-          {suggestions.map((item) => (
-            <Pressable
-              key={item.placeId}
-              onPress={() => {
-                setLocationQuery(item.label);
-                setCountryCode(item.countryCode);
-                setRegion(item.region);
-                setCity(item.city);
-                setIanaTz(item.ianaTz);
-                setPlaceId(item.placeId);
-              }}
-              style={{ paddingVertical: 10 }}
-            >
-              <Text style={{ color: colors.label, fontWeight: "600" }}>
-                {item.label}
-              </Text>
-              <Text style={{ color: colors.tint, fontSize: 12 }}>
-                {item.ianaTz}
-              </Text>
-            </Pressable>
-          ))}
-        </Card>
-      )}
-
-      {!!ianaTz && (
-        <Card>
-          <Text style={{ color: colors.secondaryLabel }}>
-            {t("clients.country")}: {countryCode}
-          </Text>
-          <Text style={{ color: colors.secondaryLabel, marginTop: 4 }}>
-            {city}, {region}
-          </Text>
-          <Text style={{ color: colors.tint, marginTop: 4, fontWeight: "700" }}>
-            {t("clients.tz")}: {ianaTz}
-          </Text>
-        </Card>
-      )}
-
-      <Field
-        label="Street (optional)"
-        value={streetAddress}
-        onChangeText={setStreetAddress}
-      />
+      <Section title={t("clients.location")} footer={t("clients.placeHint")}>
+        <FormRow
+          label={t("clients.location")}
+          value={locationQuery}
+          onChangeText={setLocationQuery}
+          placeholder={t("clients.placeHint")}
+          last={suggestions.length === 0 && !ianaTz && !streetAddress}
+        />
+        {suggestions.map((item, index) => (
+          <ListRow
+            key={item.placeId}
+            title={item.label}
+            subtitle={item.ianaTz}
+            last={
+              index === suggestions.length - 1 && !ianaTz && !streetAddress
+            }
+            onPress={() => {
+              setLocationQuery(item.label);
+              setCountryCode(item.countryCode);
+              setRegion(item.region);
+              setCity(item.city);
+              setIanaTz(item.ianaTz);
+              setPlaceId(item.placeId);
+            }}
+          />
+        ))}
+        {!!ianaTz && (
+          <ListRow
+            title={`${city}, ${region}`}
+            subtitle={`${t("clients.country")}: ${countryCode}`}
+            detail={ianaTz.split("/").pop()}
+            last={!streetAddress}
+            showChevron={false}
+          />
+        )}
+        <FormRow
+          label="Street"
+          value={streetAddress}
+          onChangeText={setStreetAddress}
+          last
+        />
+      </Section>
 
       <Button label={t("clients.save")} onPress={save} />
       {existing && (
