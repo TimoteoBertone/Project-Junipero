@@ -1,4 +1,4 @@
-# Therapy Agenda — Technical & Functional Spec (v1)
+# Project Junipero — Technical & Functional Spec (v1)
 
 React Native (Expo) mobile app for independent therapists: private client management, session scheduling with Argentina time (ART), cloud sync via Supabase, and local notifications.
 

@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "Therapy Agenda",
-    "slug": "therapy-agenda",
+    "name": "Project Junipero",
+    "slug": "project-junipero",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "scheme": "therapy-agenda",
+    "scheme": "project-junipero",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.therapyagenda.app",
+      "bundleIdentifier": "com.projectjunipero.app",
       "infoPlist": {
         "CFBundleAllowMixedLocalizations": true
       }
@@ -22,7 +22,7 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.therapyagenda.app",
+      "package": "com.projectjunipero.app",
       "predictiveBackGestureEnabled": false
     },
     "web": {

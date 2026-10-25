@@ -18,7 +18,7 @@ import {
   TherapistProfile,
 } from "../types/models";
 
-const STORAGE_KEY = "therapy-agenda.v1";
+const STORAGE_KEY = "project-junipero.v1";
 
 interface PersistedState {
   session: AuthSession | null;

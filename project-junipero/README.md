@@ -1,4 +1,4 @@
-# Therapy Agenda
+# Project Junipero
 
 React Native (Expo) app for therapists: private clients, session scheduling with Argentina time (ART), cloud sync (Supabase), and local reminders.
 

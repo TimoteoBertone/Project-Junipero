@@ -1,11 +1,11 @@
 # Project Junipero
 
-Contains **Therapy Agenda**, a React Native (Expo) mobile app for therapists.
+React Native (Expo) mobile app for therapists.
 
 ```bash
-cd therapy-agenda
+cd project-junipero
 npm install
 npx expo start
 ```
 
-See `therapy-agenda/SPEC.md` and `therapy-agenda/README.md`.
+See `project-junipero/SPEC.md` and `project-junipero/README.md`.
