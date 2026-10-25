@@ -4,7 +4,6 @@ import { ActivityIndicator, View } from "react-native";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { ReservedRegionsProvider } from "react-native-reserved-regions";
 import "../src/i18n";
 import { AppProvider, useAppStore } from "../src/store/AppStore";
 import { colors } from "../src/theme/colors";
@@ -45,23 +44,20 @@ function AuthGate({ children }: { children: React.ReactNode }) {
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      {/* iPhone Duo: fold / camera / Dynamic Island regions for layout. */}
-      <ReservedRegionsProvider style={{ flex: 1 }}>
-        <AppProvider>
-          <StatusBar style="dark" />
-          <AuthGate>
-            <Stack
-              screenOptions={{
-                headerShown: false,
-                contentStyle: { backgroundColor: colors.groupedBackground },
-              }}
-            >
-              <Stack.Screen name="(auth)" />
-              <Stack.Screen name="(app)" />
-            </Stack>
-          </AuthGate>
-        </AppProvider>
-      </ReservedRegionsProvider>
+      <AppProvider>
+        <StatusBar style="dark" />
+        <AuthGate>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: colors.groupedBackground },
+            }}
+          >
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(app)" />
+          </Stack>
+        </AuthGate>
+      </AppProvider>
     </SafeAreaProvider>
   );
 }

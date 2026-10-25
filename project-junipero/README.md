@@ -10,7 +10,7 @@ React Native (Expo) app for therapists: private clients, session scheduling with
   - `preferredPlacement="sidebar"` so open/regular-width displays can show a sidebar.
   - Content pads **left and right** safe areas independently for the vertical rail (never assume symmetry).
   - Layout uses `useWindowDimensions` (not orientation or `UIScreen.main`).
-  - `ReservedRegionsProvider` for fold / occlusion regions; multi-scene enabled.
+  - Multi-scene enabled. Fold/occlusion APIs (`react-native-reserved-regions`) need a **dev/production build**, not Expo Go.
 - Per Apple’s [Adopting Liquid Glass](https://developer.apple.com/documentation/technologyoverviews/adopting-liquid-glass) and [Prepare for iPhone Duo](https://developer.apple.com/iphone-duo/prepare/): let the system draw bars; size from available space.
 
 ## Language policy
