@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   Platform,
   Pressable,
@@ -9,19 +9,12 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-// Must use expo-router's fork — @react-navigation/elements is a different context
-// instance and always returns undefined under Expo Router native stacks.
-import { HeaderHeightContext } from "expo-router/build/react-navigation/elements";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../theme/colors";
 
 const isIOS = Platform.OS === "ios";
-/** UINavigationBar content row (excluding status bar). */
+/** UINavigationBar content row (excluding status bar) — Apple HIG. */
 const NAV_BAR_CONTENT = 44;
-
-function useOptionalHeaderHeight(): number {
-  return useContext(HeaderHeightContext) ?? 0;
-}
 
 /**
  * Content layer only. Navigation chrome (Liquid Glass UITabBar /
@@ -47,15 +40,16 @@ export function Screen({
   headerAware?: boolean;
 }) {
   const insets = useSafeAreaInsets();
-  const headerHeight = useOptionalHeaderHeight();
   const backgroundColor = grouped ? colors.groupedBackground : colors.background;
-  // Prefer measured stack header height; fall back to status bar + nav row so
-  // forms never render under the Liquid Glass bar when context is 0/stale.
-  const resolvedHeader =
-    headerHeight > insets.top
-      ? headerHeight
-      : insets.top + NAV_BAR_CONTENT;
-  const topPad = headerAware ? resolvedHeader + 8 : isIOS ? 0 : 12;
+  // status bar + standard nav row. Do not use @react-navigation/elements
+  // HeaderHeightContext here — Expo Router's native stack uses a different
+  // context instance, so that hook always under-pads and content sits under
+  // the glass bar (Agregar cliente / Nueva cita).
+  const topPad = headerAware
+    ? insets.top + NAV_BAR_CONTENT + 8
+    : isIOS
+      ? 0
+      : 12;
 
   if (scroll) {
     return (
