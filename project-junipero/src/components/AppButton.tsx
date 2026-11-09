@@ -1,5 +1,11 @@
 import React from "react";
-import { Platform, Pressable, StyleSheet, Text } from "react-native";
+import {
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { colors } from "../theme/colors";
 import { typography } from "../theme/typography";
 
@@ -16,6 +22,7 @@ export function AppButton({
   disabled,
   compact = false,
   highlighted = false,
+  leadingIcon,
 }: {
   label: string;
   onPress: () => void;
@@ -23,6 +30,7 @@ export function AppButton({
   disabled?: boolean;
   compact?: boolean;
   highlighted?: boolean;
+  leadingIcon?: React.ReactNode;
 }) {
   return (
     <Pressable
@@ -52,19 +60,22 @@ export function AppButton({
         pressed && Platform.OS === "ios" && styles.dimmed,
       ]}
     >
-      <Text
-        style={[
-          typography.headline,
-          compact && typography.callout,
-          variant === "primary" && styles.labelOnFill,
-          variant === "secondary" && styles.labelOnSecondary,
-          variant === "danger" && styles.labelOnDanger,
-          variant === "ghost" && styles.labelTint,
-          disabled && styles.disabledLabel,
-        ]}
-      >
-        {label}
-      </Text>
+      <View style={styles.content}>
+        {leadingIcon ? <View style={styles.leadingIcon}>{leadingIcon}</View> : null}
+        <Text
+          style={[
+            typography.headline,
+            compact && typography.callout,
+            variant === "primary" && styles.labelOnFill,
+            variant === "secondary" && styles.labelOnSecondary,
+            variant === "danger" && styles.labelOnDanger,
+            variant === "ghost" && styles.labelTint,
+            disabled && styles.disabledLabel,
+          ]}
+        >
+          {label}
+        </Text>
+      </View>
     </Pressable>
   );
 }
@@ -79,6 +90,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 12,
     paddingHorizontal: 20,
+  },
+  content: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  leadingIcon: {
+    width: 24,
+    height: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 8,
+    flexShrink: 0,
   },
   compact: {
     width: undefined,

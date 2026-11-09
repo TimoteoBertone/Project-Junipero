@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { useTranslation } from "react-i18next";
 import {
+  ButtonRow,
   Button,
   Field,
   Screen,
@@ -108,9 +109,49 @@ export function SignInScreen() {
       await signInDemo("demo@local.dev", "Demo Therapist");
     });
 
-  const showAppleButton =
+  const canSignInWithApple =
     Platform.OS === "ios" && appleAvailable && isAppleConfigured;
-  const showGoogleButton = isGoogleConfigured;
+  const appleProvider = (
+    <Button
+      label={t("auth.appleProvider")}
+      variant="secondary"
+      compact
+      leadingIcon={
+        <Ionicons
+          name="logo-apple"
+          size={20}
+          color={
+            !canSignInWithApple || busy
+              ? themeColors.secondaryLabel
+              : themeColors.label
+          }
+          style={styles.appleLogo}
+        />
+      }
+      onPress={onApple}
+      disabled={busy || !canSignInWithApple}
+    />
+  );
+  const googleProvider = (
+    <Button
+      label={t("auth.googleProvider")}
+      variant="secondary"
+      compact
+      leadingIcon={
+        <Ionicons
+          name="logo-google"
+          size={20}
+          color={
+            busy || !isGoogleConfigured
+              ? themeColors.secondaryLabel
+              : themeColors.googleLogo
+          }
+        />
+      }
+      onPress={onGoogle}
+      disabled={busy || !isGoogleConfigured}
+    />
+  );
 
   return (
     <Screen scroll>
@@ -220,42 +261,28 @@ export function SignInScreen() {
           </Text>
         </Pressable>
 
-        {showGoogleButton || showAppleButton ? (
-          <View style={styles.providers}>
-            <View style={styles.divider}>
-              <View style={styles.dividerLine} />
-              <Text style={[typography.footnote, styles.dividerLabel]}>
-                {t("auth.orContinueWith")}
-              </Text>
-              <View style={styles.dividerLine} />
-            </View>
-            {showGoogleButton ? (
-              <Button
-                label={t("auth.google")}
-                variant="secondary"
-                onPress={onGoogle}
-                disabled={busy}
-              />
-            ) : null}
-            {showAppleButton ? (
-              <View pointerEvents={busy ? "none" : "auto"}>
-                <AppleAuthentication.AppleAuthenticationButton
-                  buttonType={
-                    AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
-                  }
-                  buttonStyle={
-                    colorScheme === "dark"
-                      ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE
-                      : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
-                  }
-                  cornerRadius={14}
-                  onPress={onApple}
-                  style={styles.appleButton}
-                />
-              </View>
-            ) : null}
+        <View style={styles.providers}>
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={[typography.footnote, styles.dividerLabel]}>
+              {t("auth.orContinueWith")}
+            </Text>
+            <View style={styles.dividerLine} />
           </View>
-        ) : null}
+          <ButtonRow>
+            {Platform.OS === "ios" ? (
+              <>
+                {appleProvider}
+                {googleProvider}
+              </>
+            ) : (
+              <>
+                {googleProvider}
+                {appleProvider}
+              </>
+            )}
+          </ButtonRow>
+        </View>
 
         {!isSupabaseConfigured ? (
           <View style={styles.demoContainer}>
@@ -324,6 +351,9 @@ const styles = StyleSheet.create({
   providers: {
     marginTop: 20,
   },
+  appleLogo: {
+    transform: [{ translateY: -1 }],
+  },
   accountLink: {
     minHeight: 48,
     flexDirection: "row",
@@ -361,11 +391,6 @@ const styles = StyleSheet.create({
   },
   dividerLabel: {
     color: colors.secondaryLabel,
-  },
-  appleButton: {
-    width: "100%",
-    height: 52,
-    marginTop: 12,
   },
   demoContainer: {
     marginTop: 16,

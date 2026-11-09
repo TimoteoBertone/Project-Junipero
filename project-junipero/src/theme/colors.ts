@@ -24,6 +24,7 @@ export const colors = {
   tint: color("tint"),
   tintMuted: color("tintMuted"),
   fill: color("fill"),
+  googleLogo: color("googleLogo"),
   onTint: color("onTint"),
   onDanger: color("onDanger"),
   rippleOnAccent: color("rippleOnAccent"),

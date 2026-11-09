@@ -37,6 +37,8 @@
     "orContinueWith": "Or continue with",
     "google": "Continue with Google",
     "apple": "Continue with Apple",
+    "googleProvider": "Google",
+    "appleProvider": "Apple",
     "demo": "Explore the demo",
     "demoHint": "Try the app with sample clients. Your data stays on this device.",
     "demoDivider": "Or explore without an account",
