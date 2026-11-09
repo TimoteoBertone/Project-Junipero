@@ -166,6 +166,7 @@
     "loading": "Loading…",
     "account": "Account",
     "preview": "Preview",
+    "version": "Version {{version}}",
     "systemError": "Something went wrong"
   }
 }

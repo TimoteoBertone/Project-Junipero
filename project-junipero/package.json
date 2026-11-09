@@ -1,6 +1,6 @@
 {
   "name": "project-junipero",
-  "version": "1.0.0",
+  "version": "alpha-0.11.9",
   "main": "expo-router/entry",
   "dependencies": {
     "@expo/ui": "~58.0.27",

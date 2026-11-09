@@ -9,6 +9,7 @@ import {
   useColorScheme,
 } from "react-native";
 import { useRouter } from "expo-router";
+import Constants from "expo-constants";
 import { Ionicons } from "@expo/vector-icons";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { useTranslation } from "react-i18next";
@@ -283,6 +284,9 @@ export function SignInScreen() {
             style={styles.activity}
           />
         ) : null}
+        <Text style={[typography.footnote, styles.version]}>
+          {t("common.version", { version: Constants.expoConfig?.version })}
+        </Text>
       </View>
     </Screen>
   );
@@ -405,5 +409,9 @@ const styles = StyleSheet.create({
   },
   activity: {
     marginTop: 16,
+  },
+  version: {
+    textAlign: "center",
+    marginTop: 24,
   },
 });

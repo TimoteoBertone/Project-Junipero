@@ -9,6 +9,7 @@ import {
   Text,
   View,
 } from "react-native";
+import Constants from "expo-constants";
 import { Stack } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -100,7 +101,7 @@ export function SettingsScreen() {
           icon={Platform.OS === "ios" ? "checkmark" : undefined}
           variant={Platform.OS === "ios" ? "prominent" : "done"}
           separateBackground
-          tintColor={colors.tint}
+          tintColor={Platform.OS === "ios" ? "#C7425D" : colors.tint}
           accessibilityLabel={saving ? t("settings.saving") : t("settings.save")}
           onPress={() => void save()}
           disabled={!hasChanges || saving}
@@ -221,6 +222,9 @@ export function SettingsScreen() {
             last
           />
         </Section>
+        <Text style={[typography.footnote, styles.version]}>
+          {t("common.version", { version: Constants.expoConfig?.version })}
+        </Text>
       </Screen>
     </>
   );
@@ -244,5 +248,10 @@ const styles = StyleSheet.create({
   },
   saveErrorText: {
     color: colors.danger,
+  },
+  version: {
+    textAlign: "center",
+    marginTop: 16,
+    marginBottom: 8,
   },
 });

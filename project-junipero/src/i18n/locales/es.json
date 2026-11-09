@@ -166,6 +166,7 @@
     "loading": "Cargando…",
     "account": "Cuenta",
     "preview": "Vista previa",
+    "version": "Versión {{version}}",
     "systemError": "Ocurrió un error"
   }
 }

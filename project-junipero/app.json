@@ -2,7 +2,7 @@
   "expo": {
     "name": "Project Junipero",
     "slug": "project-junipero",
-    "version": "1.0.0",
+    "version": "alpha-0.11.9",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -39,7 +39,7 @@
       [
         "expo-notifications",
         {
-          "color": "#356B5E"
+          "color": "#C7425D"
         }
       ]
     ],
