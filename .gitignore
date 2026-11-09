@@ -40,3 +40,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Local copy left behind after moving the app to the repository root
+/project-junipero/
