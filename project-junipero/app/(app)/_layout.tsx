@@ -17,7 +17,7 @@ export default function AppTabsLayout() {
   return (
     <NativeTabs
       tintColor={colors.tint}
-      minimizeBehavior="onScrollDown"
+      minimizeBehavior="never"
       // Enables sidebar-adaptable tabs; on Duo open / iPad shows sidebar.
       preferredPlacement="sidebar"
     >

@@ -21,7 +21,7 @@ import {
   Title,
 } from "../../components/ui";
 import { useAppStore } from "../../store/AppStore";
-import { colors } from "../../theme/colors";
+import { colors, getThemeColors } from "../../theme/colors";
 import { typography } from "../../theme/typography";
 import {
   isAppleConfigured,
@@ -36,6 +36,7 @@ export function SignInScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const colorScheme = useColorScheme();
+  const themeColors = getThemeColors(colorScheme === "dark");
   const { establishSession, signInDemo } = useAppStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -163,7 +164,7 @@ export function SignInScreen() {
                 <Ionicons
                   name={passwordVisible ? "eye-off-outline" : "eye-outline"}
                   size={21}
-                  color={colorScheme === "dark" ? "#8FC8B4" : "#356B5E"}
+                  color={themeColors.tint}
                 />
               </Pressable>
             }
@@ -192,7 +193,7 @@ export function SignInScreen() {
             <Ionicons
               name="information-circle-outline"
               size={20}
-              color={colorScheme === "dark" ? "#8FC8B4" : "#356B5E"}
+              color={themeColors.tint}
             />
             <Text style={[typography.footnote, styles.configurationText]}>
               {t("auth.configurationNeeded")}
@@ -270,7 +271,8 @@ export function SignInScreen() {
             </Text>
             <Button
               label={t("auth.demo")}
-              variant="secondary"
+              variant="primary"
+              highlighted
               onPress={onDemo}
               disabled={busy}
             />

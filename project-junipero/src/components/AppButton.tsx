@@ -15,12 +15,14 @@ export function AppButton({
   variant = "primary",
   disabled,
   compact = false,
+  highlighted = false,
 }: {
   label: string;
   onPress: () => void;
   variant?: Variant;
   disabled?: boolean;
   compact?: boolean;
+  highlighted?: boolean;
 }) {
   return (
     <Pressable
@@ -33,7 +35,7 @@ export function AppButton({
           ? {
               color:
                 variant === "primary" || variant === "danger"
-                  ? "rgba(255,255,255,0.2)"
+                  ? colors.rippleOnAccent
                   : colors.tintMuted,
             }
           : undefined
@@ -45,7 +47,9 @@ export function AppButton({
         variant === "danger" && styles.danger,
         variant === "ghost" && styles.ghost,
         compact && styles.compact,
-        ((pressed && Platform.OS === "ios") || disabled) && { opacity: 0.45 },
+        highlighted && !disabled && styles.highlighted,
+        disabled && variant !== "ghost" && styles.disabledSurface,
+        pressed && Platform.OS === "ios" && styles.dimmed,
       ]}
     >
       <Text
@@ -54,8 +58,9 @@ export function AppButton({
           compact && typography.callout,
           variant === "primary" && styles.labelOnFill,
           variant === "secondary" && styles.labelOnSecondary,
-          variant === "danger" && styles.labelOnFill,
+          variant === "danger" && styles.labelOnDanger,
           variant === "ghost" && styles.labelTint,
+          disabled && styles.disabledLabel,
         ]}
       >
         {label}
@@ -86,12 +91,23 @@ const styles = StyleSheet.create({
   primary: { backgroundColor: colors.tint },
   secondary: { backgroundColor: colors.fill },
   danger: { backgroundColor: colors.danger },
+  highlighted: {
+    shadowColor: colors.tint,
+    shadowOpacity: 0.28,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
+  },
+  disabledSurface: { backgroundColor: colors.fill },
   ghost: {
     backgroundColor: "transparent",
     minHeight: 44,
     marginTop: 4,
   },
-  labelOnFill: { color: "#FFFFFF" },
+  labelOnFill: { color: colors.onTint },
+  labelOnDanger: { color: colors.onDanger },
   labelOnSecondary: { color: colors.label },
   labelTint: { color: colors.tint },
+  disabledLabel: { color: colors.secondaryLabel },
+  dimmed: { opacity: 0.45 },
 });

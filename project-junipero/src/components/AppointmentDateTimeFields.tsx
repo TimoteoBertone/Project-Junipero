@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import DateTimePicker from "@expo/ui/community/datetime-picker";
 import { useTranslation } from "react-i18next";
-import { colors } from "../theme/colors";
+import { colors, getThemeColors } from "../theme/colors";
 import { typography } from "../theme/typography";
 
 type PickerMode = "date" | "time";
@@ -54,8 +54,7 @@ function DateTimeField({
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const [dialogVisible, setDialogVisible] = useState(false);
-  const accentColor =
-    Platform.OS === "ios" && colorScheme === "dark" ? "#8FC8B4" : "#356B5E";
+  const accentColor = getThemeColors(colorScheme === "dark").tint;
   const displayValue = new Intl.DateTimeFormat(locale.replace("_", "-"), {
     ...(mode === "date"
       ? { weekday: "short", day: "numeric", month: "short", year: "numeric" }

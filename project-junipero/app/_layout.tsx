@@ -12,7 +12,7 @@ import {
 import { useColorScheme } from "react-native";
 import "../src/i18n";
 import { AppProvider, useAppStore } from "../src/store/AppStore";
-import { colors } from "../src/theme/colors";
+import { colors, getThemeColors } from "../src/theme/colors";
 
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { ready, session } = useAppStore();
@@ -51,8 +51,7 @@ function AppNavigationTheme({ children }: { children: React.ReactNode }) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const baseTheme = isDark ? DarkTheme : DefaultTheme;
-  const background = isDark ? "#171A18" : "#F5F5F0";
-  const surface = isDark ? "#232825" : "#FFFFFF";
+  const themeColors = getThemeColors(isDark);
 
   return (
     <ThemeProvider
@@ -60,9 +59,9 @@ function AppNavigationTheme({ children }: { children: React.ReactNode }) {
         ...baseTheme,
         colors: {
           ...baseTheme.colors,
-          background,
-          card: surface,
-          border: isDark ? "#39413C" : "#E3E7E1",
+          background: themeColors.groupedBackground,
+          card: themeColors.secondaryGrouped,
+          border: themeColors.separator,
         },
       }}
     >

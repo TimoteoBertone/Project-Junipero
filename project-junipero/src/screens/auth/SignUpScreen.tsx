@@ -12,7 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { Button, Field, Screen, Subtitle, Title } from "../../components/ui";
 import { useAppStore } from "../../store/AppStore";
-import { colors } from "../../theme/colors";
+import { colors, getThemeColors } from "../../theme/colors";
 import { typography } from "../../theme/typography";
 import { signUpWithEmailPassword } from "../../lib/auth";
 import { isSupabaseConfigured } from "../../lib/supabase";
@@ -21,6 +21,7 @@ export function SignUpScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const colorScheme = useColorScheme();
+  const themeColors = getThemeColors(colorScheme === "dark");
   const { establishSession } = useAppStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -78,7 +79,7 @@ export function SignUpScreen() {
       <Ionicons
         name={passwordVisible ? "eye-off-outline" : "eye-outline"}
         size={21}
-        color={colorScheme === "dark" ? "#8FC8B4" : "#356B5E"}
+        color={themeColors.tint}
       />
     </Pressable>
   );
@@ -156,7 +157,7 @@ export function SignUpScreen() {
             <Ionicons
               name="information-circle-outline"
               size={20}
-              color={colorScheme === "dark" ? "#8FC8B4" : "#356B5E"}
+              color={themeColors.tint}
             />
             <Text style={[typography.footnote, styles.configurationText]}>
               {t("auth.configurationNeeded")}

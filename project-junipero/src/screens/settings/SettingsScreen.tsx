@@ -101,7 +101,7 @@ export function SettingsScreen() {
           icon={Platform.OS === "ios" ? "checkmark" : undefined}
           variant={Platform.OS === "ios" ? "prominent" : "done"}
           separateBackground
-          tintColor={Platform.OS === "ios" ? "#C7425D" : colors.tint}
+          tintColor={colors.tint}
           accessibilityLabel={saving ? t("settings.saving") : t("settings.save")}
           onPress={() => void save()}
           disabled={!hasChanges || saving}

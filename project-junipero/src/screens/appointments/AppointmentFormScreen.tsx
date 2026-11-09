@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
   },
   modalBackdrop: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: "rgba(0,0,0,0.35)",
+    backgroundColor: colors.overlay,
   },
   pickerSheet: {
     height: "70%",
